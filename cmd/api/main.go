@@ -26,8 +26,8 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	r.Route("/escolas", func(r chi.Router) {
-		r.Post("/", handler.Criar)
-		r.Get("/", handler.Index)
+		r.Post("/", endpoints.HandlerErro(handler.Criar))
+		r.Get("/", endpoints.HandlerErro(handler.Index))
 	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {

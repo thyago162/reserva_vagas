@@ -1,21 +1,32 @@
 package escolas
 
-import "github.com/google/uuid"
+import (
+	"reserva_vagas/internalerrors"
+
+	"github.com/google/uuid"
+)
 
 type Escola struct {
 	Id    string `gorm:"primaryKey"`
-	Nome  string
-	Inep  string
-	Email string
-	Sigla string
+	Nome  string `validate:"min=5,max=24,required"`
+	Inep  string `validate:"min=6,required"`
+	Email string `validate:"email,required"`
+	Sigla string `validate:"required,max=10"`
 }
 
 func NewEscola(nome string, inep string, email string, sigla string) (*Escola, error) {
-	return &Escola{
+	escola := &Escola{
 		Id:    uuid.NewString(),
 		Nome:  nome,
 		Inep:  inep,
 		Email: email,
 		Sigla: sigla,
-	}, nil
+	}
+
+	err := internalerrors.ValidateStruct(escola)
+	if err == nil {
+		return escola, nil
+	}
+
+	return nil, err
 }
