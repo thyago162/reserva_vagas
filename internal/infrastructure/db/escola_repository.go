@@ -26,3 +26,10 @@ func (e *EscolaRepositoryDb) GetAll() ([]*escolas.Escola, error) {
 
 	return escolasLista, tx.Error
 }
+
+func (e *EscolaRepositoryDb) GetById(id string) (*escolas.Escola, error) {
+	var escola *escolas.Escola
+	tx := e.Db.First(&escola, id)
+
+	return escola, tx.Error
+}

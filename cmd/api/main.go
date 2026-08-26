@@ -28,6 +28,7 @@ func main() {
 	r.Route("/escolas", func(r chi.Router) {
 		r.Post("/", endpoints.HandlerErro(handler.Criar))
 		r.Get("/", endpoints.HandlerErro(handler.Index))
+		r.Get("/{id}", endpoints.HandlerErro(handler.Show))
 	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {

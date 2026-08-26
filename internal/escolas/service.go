@@ -29,3 +29,12 @@ func (s *Service) GetEscolas() ([]*Escola, error) {
 
 	return escolas, nil
 }
+
+func (s Service) GetEscolaById(id string) (*Escola, error) {
+	escola, err := s.repo.GetById(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return escola, nil
+}

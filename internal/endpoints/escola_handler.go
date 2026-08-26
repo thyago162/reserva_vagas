@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"reserva_vagas/internal/escolas"
+	"reserva_vagas/internalerrors"
+
+	"github.com/go-chi/chi"
 )
 
 type EscolaHandler struct {
@@ -49,4 +52,18 @@ func (h *EscolaHandler) Index(w http.ResponseWriter, r *http.Request) (interface
 	}
 
 	return escolasDb, http.StatusOK, nil
+}
+
+func (h *EscolaHandler) Show(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, http.StatusBadRequest, internalerrors.ErrValidation
+	}
+
+	escola, err := h.service.GetEscolaById(id)
+	if err != nil {
+		return nil, http.StatusNotFound, err
+	}
+
+	return escola, http.StatusOK, nil
 }
