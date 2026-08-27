@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"reserva_vagas/cmd/seed"
 	"reserva_vagas/internal/endpoints"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db"
@@ -17,6 +18,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//Seed
+	seed.Seed(database)
 
 	repo := db.NewEscolaRepositoryDb(database)
 	service := escolas.NewService(repo)
