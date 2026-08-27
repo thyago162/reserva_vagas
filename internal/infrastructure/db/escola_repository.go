@@ -33,3 +33,13 @@ func (e *EscolaRepositoryDb) GetById(id string) (*escolas.Escola, error) {
 
 	return escola, tx.Error
 }
+
+func (e *EscolaRepositoryDb) Update(escola *escolas.Escola) error {
+	tx := e.Db.Save(escola)
+	return tx.Error
+}
+
+func (e *EscolaRepositoryDb) Destroy(id string) error {
+	tx := e.Db.Delete(&escolas.Escola{}, "id = ?", id)
+	return tx.Error
+}

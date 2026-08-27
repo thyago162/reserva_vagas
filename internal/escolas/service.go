@@ -1,5 +1,7 @@
 package escolas
 
+import "reserva_vagas/internalerrors"
+
 type Service struct {
 	repo Repository
 }
@@ -37,4 +39,26 @@ func (s Service) GetEscolaById(id string) (*Escola, error) {
 	}
 
 	return escola, nil
+}
+
+func (s Service) UpdateEscola(id, nome, inep, email, sigla string) error {
+	escola, err := s.repo.GetById(id)
+	if err != nil {
+		return err
+	}
+
+	escola.Nome = nome
+	escola.Inep = inep
+	escola.Email = email
+	escola.Sigla = sigla
+
+	if err := internalerrors.ValidateStruct(escola); err != nil {
+		return err
+	}
+
+	return s.repo.Update(escola)
+}
+
+func (s Service) Destroy(id string) error {
+	return s.repo.Destroy(id)
 }

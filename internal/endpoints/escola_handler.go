@@ -17,7 +17,7 @@ func NewEscolaHandler(s *escolas.Service) *EscolaHandler {
 	return &EscolaHandler{service: s}
 }
 
-type CriarEscolaRequest struct {
+type CriarUpdateEscolaRequest struct {
 	Nome  string `json:"nome"`
 	Inep  string `json:"inep"`
 	Email string `json:"email"`
@@ -25,7 +25,7 @@ type CriarEscolaRequest struct {
 }
 
 func (h *EscolaHandler) Criar(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	var req CriarEscolaRequest
+	var req CriarUpdateEscolaRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
@@ -66,4 +66,37 @@ func (h *EscolaHandler) Show(w http.ResponseWriter, r *http.Request) (interface{
 	}
 
 	return escola, http.StatusOK, nil
+}
+
+func (h *EscolaHandler) Update(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, http.StatusBadRequest, internalerrors.ErrInternal
+	}
+
+	var req CriarUpdateEscolaRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	err := h.service.UpdateEscola(id, req.Nome, req.Inep, req.Email, req.Sigla)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return map[string]string{"message": "Escola atualizada com sucesso"}, http.StatusOK, nil
+}
+
+func (h *EscolaHandler) Destroy(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	id := chi.URLParam(r, "id")
+	if id == "" {
+		return nil, http.StatusBadRequest, internalerrors.ErrValidation
+	}
+
+	err := h.service.Destroy(id)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return map[string]string{"message": "Escola atualizada com sucesso"}, http.StatusOK, nil
 }

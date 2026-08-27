@@ -29,6 +29,8 @@ func main() {
 		r.Post("/", endpoints.HandlerErro(handler.Criar))
 		r.Get("/", endpoints.HandlerErro(handler.Index))
 		r.Get("/{id}", endpoints.HandlerErro(handler.Show))
+		r.Put("/{id}", endpoints.HandlerErro(handler.Update))
+		r.Delete("/{id}", endpoints.HandlerErro(handler.Destroy))
 	})
 
 	if err := http.ListenAndServe(":3000", r); err != nil {
