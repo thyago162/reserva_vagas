@@ -8,15 +8,15 @@ import (
 
 type EtapaEnsino struct {
 	Id    string `gorm:"primaryKey"`
-	Nome  string `validate:"min:3,required,max:15"`
-	Sigla string `validate:"required,min:2,max:3" gorm:"uniqueIndex"`
+	Nome  string `validate:"required,max=50"`
+	Sigla string `validate:"required,max=10" gorm:"uniqueIndex"`
 }
 
 type Escolaridade struct {
-	Id            string      `gorm:"primaryKey"`
-	Nome          string      `validate:"min:3,required,max:50"`
-	EtapaEnsinoId string      `validate:"required" gorm:"type:varchar(36);not null"`
-	EtapaEnsino   EtapaEnsino `gorm:"foreingKey:EtapaEnsinoId;constraint:CASCADE,OnDelete:RESTRICT;"`
+	Id            string       `gorm:"primaryKey"`
+	Nome          string       `validate:"required,max=50"`
+	EtapaEnsinoId string       `validate:"required" gorm:"type:varchar(36);not null"`
+	EtapaEnsino   *EtapaEnsino `gorm:"foreingKey:EtapaEnsinoId;constraint:CASCADE,OnDelete:RESTRICT;"`
 }
 
 func NewEtapaEnsino(nome, sigla string) (*EtapaEnsino, error) {
@@ -34,7 +34,7 @@ func NewEtapaEnsino(nome, sigla string) (*EtapaEnsino, error) {
 	return nil, err
 }
 
-func NewEscolaridade(nome, etapaEnsinoId string) (*Escolaridade, error) {
+func NewEscolaridade(nome string, etapaEnsinoId string) (*Escolaridade, error) {
 	escolaridade := &Escolaridade{
 		Id:            uuid.New().String(),
 		Nome:          nome,

@@ -8,7 +8,7 @@ import (
 
 type Turno struct {
 	Id   string `gorm:"primaryKey"`
-	Nome string `validate:"required,min:5,max:10"`
+	Nome string `validate:"required,min=5,max=10"`
 }
 
 func NewTurno(nome string) (*Turno, error) {

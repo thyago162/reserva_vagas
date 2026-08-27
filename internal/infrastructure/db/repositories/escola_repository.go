@@ -1,4 +1,4 @@
-package db
+package repositories
 
 import (
 	"reserva_vagas/internal/escolas"

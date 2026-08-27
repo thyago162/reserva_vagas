@@ -3,10 +3,11 @@ package main
 import (
 	"log"
 	"net/http"
-	"reserva_vagas/cmd/seed"
 	"reserva_vagas/internal/endpoints"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db"
+	"reserva_vagas/internal/infrastructure/db/repositories"
+	"reserva_vagas/internal/infrastructure/db/seed"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -22,7 +23,7 @@ func main() {
 	//Seed
 	seed.Seed(database)
 
-	repo := db.NewEscolaRepositoryDb(database)
+	repo := repositories.NewEscolaRepositoryDb(database)
 	service := escolas.NewService(repo)
 	handler := endpoints.NewEscolaHandler(service)
 
