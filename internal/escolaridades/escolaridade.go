@@ -16,7 +16,7 @@ type Escolaridade struct {
 	Id            string       `gorm:"primaryKey"`
 	Nome          string       `validate:"required,max=50"`
 	EtapaEnsinoId string       `validate:"required" gorm:"type:varchar(36);not null"`
-	EtapaEnsino   *EtapaEnsino `gorm:"foreingKey:EtapaEnsinoId;constraint:CASCADE,OnDelete:RESTRICT;"`
+	EtapaEnsino   *EtapaEnsino `gorm:"foreingKey:EtapaEnsinoId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }
 
 func NewEtapaEnsino(nome, sigla string) (*EtapaEnsino, error) {

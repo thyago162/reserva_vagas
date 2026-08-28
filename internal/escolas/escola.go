@@ -7,11 +7,13 @@ import (
 )
 
 type Escola struct {
-	Id    string `gorm:"primaryKey"`
-	Nome  string `validate:"min=5,max=24,required"`
-	Inep  string `validate:"min=6,required"`
-	Email string `validate:"email,required"`
-	Sigla string `validate:"required,max=10"`
+	Id                 string               `gorm:"primaryKey"`
+	Nome               string               `validate:"min=5,max=24,required"`
+	Inep               string               `validate:"min=6,required"`
+	Email              string               `validate:"email,required"`
+	Sigla              string               `validate:"required,max=10"`
+	EscolaridadeEscola []EscolaridadeEscola `gorm:"foreignKey:EscolaId"`
+	EscolaTurno        []EscolaTurno        `gorm:"foreignKey:EscolaId"`
 }
 
 func NewEscola(nome string, inep string, email string, sigla string) (*Escola, error) {
