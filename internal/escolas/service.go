@@ -16,7 +16,7 @@ func (s *Service) SalvarEscola(nome string, inep string, email string, sigla str
 		return err
 	}
 
-	if err := s.repo.Salvar(escola); err != nil {
+	if err := s.repo.Store(escola); err != nil {
 		return err
 	}
 
@@ -24,7 +24,7 @@ func (s *Service) SalvarEscola(nome string, inep string, email string, sigla str
 }
 
 func (s *Service) GetEscolas() ([]*Escola, error) {
-	escolas, err := s.repo.GetAll()
+	escolas, err := s.repo.Index()
 	if err != nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (s *Service) GetEscolas() ([]*Escola, error) {
 }
 
 func (s Service) GetEscolaById(id string) (*Escola, error) {
-	escola, err := s.repo.GetById(id)
+	escola, err := s.repo.Show(id)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (s Service) GetEscolaById(id string) (*Escola, error) {
 }
 
 func (s Service) UpdateEscola(id, nome, inep, email, sigla string) error {
-	escola, err := s.repo.GetById(id)
+	escola, err := s.repo.Show(id)
 	if err != nil {
 		return err
 	}
