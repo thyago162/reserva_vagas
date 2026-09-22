@@ -2,7 +2,6 @@ package escolas
 
 import (
 	"reserva_vagas/internal/escolaridades"
-	"reserva_vagas/internalerrors"
 )
 
 type EscolaridadeEscolaService struct {
@@ -16,36 +15,20 @@ func NewEscolaridadeEscolaService(ree EscolaridadeEscolaRepository, r Repository
 }
 
 func (s *EscolaridadeEscolaService) AddEscolaridadeEscola(escolaridadeId, escolaId string) error {
-	escola, err := s.repo.Show(escolaId)
+	if _, err := s.repo.Show(escolaId); err != nil {
+		return err
+	}
 
+	if _, err := s.repoE.Show(escolaridadeId); err != nil {
+		return err
+	}
+
+	escolEscola, err := NewEscolaridadeEscola(escolaId, escolaridadeId)
 	if err != nil {
 		return err
 	}
 
-	escolaridade, err := s.repoE.Show(escolaridadeId)
-	if err != nil {
-		return err
-	}
-
-	exists, err := s.repoEE.Exists(escolaridadeId, escolaId)
-	if err != nil {
-		return err
-	}
-
-	if exists {
-		return internalerrors.ErrRegistroExiste
-	}
-
-	escolaridadeEscola, err := NewEscolaridadeEscola(escola.Id, escolaridade.Id)
-	if err != nil {
-		return err
-	}
-
-	if err := s.repoEE.Store(escolaridadeEscola); err != nil {
-		return err
-	}
-
-	return nil
+	return s.repoEE.Store(escolEscola)
 }
 
 func (s *EscolaridadeEscolaService) ExibirEscolaridadesEscola(escolaId string) ([]*EscolaridadeEscola, error) {

@@ -1,7 +1,9 @@
 package repositories
 
 import (
+	"errors"
 	"reserva_vagas/internal/escolas"
+	"reserva_vagas/internalerrors"
 
 	"gorm.io/gorm"
 )
@@ -24,10 +26,15 @@ func (e *EscolaridadeEscolaRepositoryDb) Index(escolaID string) ([]*escolas.Esco
 	return escolaridadeEscolaLista, nil
 }
 
-func (e *EscolaridadeEscolaRepositoryDb) Store(escolaridadeEscola *escolas.EscolaridadeEscola) error {
-	tx := e.Db.Create(escolaridadeEscola)
+func (e *EscolaridadeEscolaRepositoryDb) Store(ee *escolas.EscolaridadeEscola) error {
+	if err := e.Db.Create(ee).Error; err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return internalerrors.ErrRegistroExiste
+		}
+		return err
+	}
 
-	return tx.Error
+	return nil
 }
 
 func (e *EscolaridadeEscolaRepositoryDb) Exists(escolaridadeID, escolaID string) (bool, error) {

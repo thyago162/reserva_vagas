@@ -1,19 +1,18 @@
-package endpoints
+package escolas
 
 import (
 	"encoding/json"
 	"net/http"
-	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internalerrors"
 
 	"github.com/go-chi/chi"
 )
 
 type EscolaHandler struct {
-	service *escolas.Service
+	service *Service
 }
 
-func NewEscolaHandler(s *escolas.Service) *EscolaHandler {
+func NewEscolaHandler(s *Service) *EscolaHandler {
 	return &EscolaHandler{service: s}
 }
 
@@ -48,7 +47,7 @@ func (h *EscolaHandler) Index(w http.ResponseWriter, r *http.Request) (interface
 	}
 
 	if escolasDb == nil {
-		escolasDb = make([]*escolas.Escola, 0)
+		escolasDb = make([]*Escola, 0)
 	}
 
 	return escolasDb, http.StatusOK, nil
