@@ -1,0 +1,19 @@
+package endpoints
+
+import (
+	"reserva_vagas/internal/escolas"
+	"reserva_vagas/internal/infrastructure/db/repositories"
+
+	"github.com/go-chi/chi"
+	"gorm.io/gorm"
+)
+
+func InitRoutes(r chi.Router, database *gorm.DB) {
+	// ==========================================
+	// Módulo: Escolas
+	// ==========================================
+	repoEscola := repositories.NewEscolaRepositoryDb(database)
+	repoEE := repositories.NewEscolaridadeEscolaRepositoryDb(database)
+
+	escolas.RegisterRoutes(r, repoEscola, repoEE)
+}

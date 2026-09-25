@@ -1,12 +1,11 @@
 package escolas
 
 import (
-	"reserva_vagas/internal/endpoints"
+	"reserva_vagas/internal/infrastructure/http"
 
 	"github.com/go-chi/chi"
 )
 
-// O pacote escolas recebe os Repositórios/Interfaces que ele precisa, sem importar o pacote repositories!
 func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepository) {
 	service := NewService(repo)
 	eeService := NewEscolaridadeEscolaService(repoEE, repo, nil)
@@ -15,16 +14,16 @@ func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepo
 	eeHandler := NewEscolaridadeEscolaHandler(eeService)
 
 	r.Route("/escolas", func(r chi.Router) {
-		r.Post("/", endpoints.HandlerErro(handler.Criar))
-		r.Get("/", endpoints.HandlerErro(handler.Index))
-		r.Get("/{id}", endpoints.HandlerErro(handler.Show))
-		r.Put("/{id}", endpoints.HandlerErro(handler.Update))
-		r.Delete("/{id}", endpoints.HandlerErro(handler.Destroy))
+		r.Post("/", http.HandlerErro(handler.Criar))
+		r.Get("/", http.HandlerErro(handler.Index))
+		r.Get("/{id}", http.HandlerErro(handler.Show))
+		r.Put("/{id}", http.HandlerErro(handler.Update))
+		r.Delete("/{id}", http.HandlerErro(handler.Destroy))
 
 	})
 
 	r.Route("/escolaridade-escola", func(r chi.Router) {
-		r.Post("/", endpoints.HandlerErro(eeHandler.Store))
-		r.Get("/", endpoints.HandlerErro(eeHandler.Index))
+		r.Post("/", http.HandlerErro(eeHandler.Store))
+		r.Get("/", http.HandlerErro(eeHandler.Index))
 	})
 }

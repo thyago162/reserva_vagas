@@ -8,7 +8,7 @@ import (
 
 type Escola struct {
 	Id                 string               `gorm:"primaryKey"`
-	Nome               string               `validate:"min=5,max=24,required"`
+	Nome               string               `validate:"min=5,max=150,required"`
 	Inep               string               `validate:"min=6,required"`
 	Email              string               `validate:"email,required"`
 	Sigla              string               `validate:"required,max=10"`

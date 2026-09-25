@@ -1,6 +1,7 @@
 package escolas
 
 import (
+	"fmt"
 	"reserva_vagas/internal/escolaridades"
 )
 
@@ -19,14 +20,22 @@ func (s *EscolaridadeEscolaService) AddEscolaridadeEscola(escolaridadeId, escola
 		return err
 	}
 
+	fmt.Println("chegou 1")
+
 	if _, err := s.repoE.Show(escolaridadeId); err != nil {
 		return err
 	}
+
+	fmt.Println("chegou 2")
 
 	escolEscola, err := NewEscolaridadeEscola(escolaId, escolaridadeId)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println("chegou 3")
+
+	fmt.Println(escolEscola)
 
 	return s.repoEE.Store(escolEscola)
 }

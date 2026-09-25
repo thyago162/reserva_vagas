@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"reserva_vagas/internal/endpoints"
 	"reserva_vagas/internal/infrastructure/db"
 	"reserva_vagas/internal/infrastructure/db/seed"
 
@@ -22,6 +23,8 @@ func main() {
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+
+	endpoints.InitRoutes(r, database)
 
 	if err := http.ListenAndServe(":3000", r); err != nil {
 		log.Fatal("Erro ao iniciar o servidor:", err)

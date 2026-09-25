@@ -29,9 +29,9 @@ func (e *EscolaRepositoryDb) Index() ([]*escolas.Escola, error) {
 
 func (e *EscolaRepositoryDb) Show(id string) (*escolas.Escola, error) {
 	var escola *escolas.Escola
-	tx := e.Db.First(&escola, id)
+	err := e.Db.Where("id = ?", id).First(&escola).Error
 
-	return escola, tx.Error
+	return escola, err
 }
 
 func (e *EscolaRepositoryDb) Update(escola *escolas.Escola) error {

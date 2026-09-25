@@ -16,8 +16,8 @@ func NewEscolaridadeEscolaHandler(s *EscolaridadeEscolaService) *EscolaridadeEsc
 }
 
 type CriarUpdateEscolEscolaRequest struct {
-	EscolaID       string `json:"escolaId"`
-	EscolaridadeID string `json:"escolaridadeId"`
+	EscolaID       string `json:"escola_id"`
+	EscolaridadeID string `json:"escolaridade_id"`
 }
 
 func (h *EscolaridadeEscolaHandler) Store(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
