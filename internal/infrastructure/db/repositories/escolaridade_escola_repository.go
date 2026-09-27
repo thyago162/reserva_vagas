@@ -56,3 +56,16 @@ func (e *EscolaridadeEscolaRepositoryDb) Exists(escolaridadeID, escolaID string)
 
 	return tx.RowsAffected > 0, nil
 }
+
+func (e *EscolaridadeEscolaRepositoryDb) Destroy(ids []string) error {
+	if len(ids) == 0 {
+		return errors.New("Não há nada para remover...")
+	}
+
+	tx := e.Db.Delete(&escolas.EscolaridadeEscola{}, "id IN ?", ids)
+	if tx.RowsAffected == 0 {
+		return errors.New("nenhum vínculo foi encontrado para os IDs informados")
+	}
+
+	return tx.Error
+}

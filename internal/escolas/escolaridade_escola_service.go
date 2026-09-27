@@ -53,3 +53,12 @@ func (s *EscolaridadeEscolaService) ExibirEscolaridadesEscola(escolaId string) (
 
 	return escolaridades, nil
 }
+
+func (s *EscolaridadeEscolaService) Remover(ids []string) error {
+	err := s.repoEE.Destroy(ids)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
