@@ -16,8 +16,8 @@ func NewEscolaridadeEscolaHandler(s *EscolaridadeEscolaService) *EscolaridadeEsc
 }
 
 type CriarUpdateEscolEscolaRequest struct {
-	EscolaID       string `json:"escola_id"`
-	EscolaridadeID string `json:"escolaridade_id"`
+	EscolaID        string   `json:"escola_id"`
+	EscolaridadeIDS []string `json:"escolaridade_ids"`
 }
 
 func (h *EscolaridadeEscolaHandler) Store(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
@@ -26,7 +26,7 @@ func (h *EscolaridadeEscolaHandler) Store(w http.ResponseWriter, r *http.Request
 		return nil, http.StatusBadRequest, err
 	}
 
-	err := h.service.AddEscolaridadeEscola(req.EscolaridadeID, req.EscolaID)
+	err := h.service.AddEscolaridadeEscola(req.EscolaridadeIDS, req.EscolaID)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}

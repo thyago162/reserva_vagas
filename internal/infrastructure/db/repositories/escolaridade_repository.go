@@ -20,3 +20,13 @@ func (e *EscolaridadeRepositoryDb) Show(id string) (*escolaridades.Escolaridade,
 
 	return &escolaridade, err
 }
+
+func (e *EscolaridadeRepositoryDb) FindByIds(ids []string) (int64, error) {
+	var count int64
+	err := e.Db.Model(&escolaridades.Escolaridade{}).Where("id in ?", ids).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

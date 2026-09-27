@@ -26,8 +26,12 @@ func (e *EscolaridadeEscolaRepositoryDb) Index(escolaID string) ([]*escolas.Esco
 	return escolaridadeEscolaLista, nil
 }
 
-func (e *EscolaridadeEscolaRepositoryDb) Store(ee *escolas.EscolaridadeEscola) error {
-	if err := e.Db.Create(ee).Error; err != nil {
+func (e *EscolaridadeEscolaRepositoryDb) Store(ee []*escolas.EscolaridadeEscola) error {
+	if len(ee) == 0 {
+		return nil
+	}
+
+	if err := e.Db.Model(&escolas.EscolaridadeEscola{}).Create(ee).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return internalerrors.ErrRegistroExiste
 		}
