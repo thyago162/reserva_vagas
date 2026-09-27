@@ -14,6 +14,7 @@ func InitRoutes(r chi.Router, database *gorm.DB) {
 	// ==========================================
 	repoEscola := repositories.NewEscolaRepositoryDb(database)
 	repoEE := repositories.NewEscolaridadeEscolaRepositoryDb(database)
+	repoE := repositories.NewEscolaridadeRepositoryDb(database)
 
-	escolas.RegisterRoutes(r, repoEscola, repoEE)
+	escolas.RegisterRoutes(r, repoEscola, repoEE, repoE)
 }

@@ -15,8 +15,8 @@ func NewEscolaridadeRepositoryDb(db *gorm.DB) *EscolaridadeRepositoryDb {
 }
 
 func (e *EscolaridadeRepositoryDb) Show(id string) (*escolaridades.Escolaridade, error) {
-	var escolaridade *escolaridades.Escolaridade
+	var escolaridade escolaridades.Escolaridade
 	err := e.Db.Where("id = ?", id).First(&escolaridade).Error
 
-	return escolaridade, err
+	return &escolaridade, err
 }

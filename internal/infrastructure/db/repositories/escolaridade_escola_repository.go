@@ -18,7 +18,7 @@ func NewEscolaridadeEscolaRepositoryDb(db *gorm.DB) *EscolaridadeEscolaRepositor
 
 func (e *EscolaridadeEscolaRepositoryDb) Index(escolaID string) ([]*escolas.EscolaridadeEscola, error) {
 	var escolaridadeEscolaLista []*escolas.EscolaridadeEscola
-	tx := e.Db.Preload("escolaridade").Where("escola_id = ?", escolaID).Find(&escolaridadeEscolaLista)
+	tx := e.Db.Preload("Escolaridade").Where("escola_id = ?", escolaID).Find(&escolaridadeEscolaLista)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}

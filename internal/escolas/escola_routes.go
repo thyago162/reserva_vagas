@@ -1,14 +1,15 @@
 package escolas
 
 import (
+	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/infrastructure/http"
 
 	"github.com/go-chi/chi"
 )
 
-func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepository) {
+func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepository, repoE escolaridades.Repository) {
 	service := NewService(repo)
-	eeService := NewEscolaridadeEscolaService(repoEE, repo, nil)
+	eeService := NewEscolaridadeEscolaService(repoEE, repo, repoE)
 
 	handler := NewEscolaHandler(service)
 	eeHandler := NewEscolaridadeEscolaHandler(eeService)
