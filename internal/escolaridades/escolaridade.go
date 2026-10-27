@@ -7,9 +7,9 @@ import (
 )
 
 type EtapaEnsino struct {
-	Id    string `gorm:"primaryKey"`
+	Id    string `gorm:"primaryKey;size:36"`
 	Nome  string `validate:"required,max=50"`
-	Sigla string `validate:"required,max=10" gorm:"uniqueIndex"`
+	Sigla string `validate:"required,max=10" gorm:"uniqueIndex;type:varchar(10);not null"`
 }
 
 type Escolaridade struct {

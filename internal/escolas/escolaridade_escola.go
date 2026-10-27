@@ -8,9 +8,9 @@ import (
 )
 
 type EscolaridadeEscola struct {
-	Id             string                      `gorm:"primaryKey"`
+	Id             string                      `gorm:"primaryKey;size:36"`
 	EscolaId       string                      `gorm:"type:varchar(36);not null;uniqueIndex:idx_escola_escolaridade"`
-	EscolaridadeId string                      `gorm:"type:varchar(36);not null;uniqueIndex:idx_escola_escolaridade"`
+	EscolaridadeId string                      `gorm:"size:36;not null;uniqueIndex:idx_escola_escolaridade"`
 	Escola         *Escola                     `gorm:"foreignKey:EscolaId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 	Escolaridade   *escolaridades.Escolaridade `gorm:"foreignKey:EscolaridadeId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 }

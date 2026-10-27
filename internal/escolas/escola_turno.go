@@ -8,7 +8,7 @@ import (
 )
 
 type EscolaTurno struct {
-	Id       string        `gorm:"primaryKey"`
+	Id       string        `gorm:"primaryKey;size:36"`
 	EscolaId string        `gorm:"type:varchar(36);not null"`
 	TurnoId  string        `gorm:"type:varchar(36);not null"`
 	Escola   *Escola       `gorm:"foreignKey:EscolaId;constraint:onUpdate:CASCADE,onDelete:RESTRICT"`

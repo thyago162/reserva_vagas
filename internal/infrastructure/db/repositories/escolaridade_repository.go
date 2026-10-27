@@ -30,3 +30,13 @@ func (e *EscolaridadeRepositoryDb) FindByIds(ids []string) (int64, error) {
 
 	return count, nil
 }
+
+func (e *EscolaridadeRepositoryDb) Index() ([]*escolaridades.Escolaridade, error) {
+	var escolaridades []*escolaridades.Escolaridade
+	err := e.Db.Order("nome DESC").Find(&escolaridades).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return escolaridades, nil
+}

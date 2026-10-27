@@ -1,6 +1,7 @@
 package endpoints
 
 import (
+	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db/repositories"
 
@@ -17,4 +18,10 @@ func InitRoutes(r chi.Router, database *gorm.DB) {
 	repoE := repositories.NewEscolaridadeRepositoryDb(database)
 
 	escolas.RegisterRoutes(r, repoEscola, repoEE, repoE)
+
+	// ==========================================
+	// Módulo: Escolaridades
+	// ==========================================
+	repoEscolaridade := repositories.NewEscolaridadeRepositoryDb(database)
+	escolaridades.RegisterRoutes(r, repoEscolaridade)
 }
