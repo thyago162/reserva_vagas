@@ -3,6 +3,7 @@ package escolas
 import (
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internalerrors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -11,6 +12,8 @@ type EscolaridadeEscola struct {
 	Id             string                      `gorm:"primaryKey;size:36"`
 	EscolaId       string                      `gorm:"type:varchar(36);not null;uniqueIndex:idx_escola_escolaridade"`
 	EscolaridadeId string                      `gorm:"size:36;not null;uniqueIndex:idx_escola_escolaridade"`
+	CreatedAt      time.Time                   `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time                   `gorm:"autoUpdateTime"`
 	Escola         *Escola                     `gorm:"foreignKey:EscolaId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 	Escolaridade   *escolaridades.Escolaridade `gorm:"foreignKey:EscolaridadeId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
 }

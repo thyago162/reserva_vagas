@@ -2,6 +2,7 @@ package escolas
 
 import (
 	"reserva_vagas/internalerrors"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -12,17 +13,21 @@ type Escola struct {
 	Inep               string               `validate:"min=6,required"`
 	Email              string               `validate:"email,required"`
 	Sigla              string               `validate:"required,max=10"`
+	Telefone           string               `validate:"required,max=15"`
+	CreatedAt          time.Time            `gorm:"autoCreateTime"`
+	UpdatedAt          time.Time            `gorm:"autoUpdateTime"`
 	EscolaridadeEscola []EscolaridadeEscola `gorm:"foreignKey:EscolaId"`
 	EscolaTurno        []EscolaTurno        `gorm:"foreignKey:EscolaId"`
 }
 
-func NewEscola(nome string, inep string, email string, sigla string) (*Escola, error) {
+func NewEscola(nome string, inep string, email string, sigla string, telefone string) (*Escola, error) {
 	escola := &Escola{
-		Id:    uuid.NewString(),
-		Nome:  nome,
-		Inep:  inep,
-		Email: email,
-		Sigla: sigla,
+		Id:       uuid.NewString(),
+		Nome:     nome,
+		Inep:     inep,
+		Email:    email,
+		Sigla:    sigla,
+		Telefone: telefone,
 	}
 
 	err := internalerrors.ValidateStruct(escola)

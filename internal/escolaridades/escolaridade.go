@@ -2,19 +2,24 @@ package escolaridades
 
 import (
 	"reserva_vagas/internalerrors"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type EtapaEnsino struct {
-	Id    string `gorm:"primaryKey;size:36"`
-	Nome  string `validate:"required,max=50"`
-	Sigla string `validate:"required,max=10" gorm:"uniqueIndex;type:varchar(10);not null"`
+	Id        string    `gorm:"primaryKey;size:36"`
+	Nome      string    `validate:"required,max=50"`
+	Sigla     string    `validate:"required,max=10" gorm:"uniqueIndex;type:varchar(10);not null"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }
 
 type Escolaridade struct {
 	Id            string       `gorm:"primaryKey"`
 	Nome          string       `validate:"required,max=50"`
+	CreatedAt     time.Time    `gorm:"autoCreateTime"`
+	UpdatedAt     time.Time    `gorm:"autoUpdateTime"`
 	EtapaEnsinoId string       `validate:"required" gorm:"type:varchar(36);not null"`
 	EtapaEnsino   *EtapaEnsino `gorm:"foreingKey:EtapaEnsinoId;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }

@@ -10,8 +10,8 @@ func NewService(r Repository) *Service {
 	return &Service{repo: r}
 }
 
-func (s *Service) SalvarEscola(nome string, inep string, email string, sigla string) error {
-	escola, err := NewEscola(nome, inep, email, sigla)
+func (s *Service) SalvarEscola(nome string, inep string, email string, sigla string, telefone string) error {
+	escola, err := NewEscola(nome, inep, email, sigla, telefone)
 	if err != nil {
 		return err
 	}
@@ -41,7 +41,7 @@ func (s Service) GetEscolaById(id string) (*Escola, error) {
 	return escola, nil
 }
 
-func (s Service) UpdateEscola(id, nome, inep, email, sigla string) error {
+func (s Service) UpdateEscola(id, nome, inep, email, sigla, telefone string) error {
 	escola, err := s.repo.Show(id)
 	if err != nil {
 		return err
@@ -51,6 +51,7 @@ func (s Service) UpdateEscola(id, nome, inep, email, sigla string) error {
 	escola.Inep = inep
 	escola.Email = email
 	escola.Sigla = sigla
+	escola.Telefone = telefone
 
 	if err := internalerrors.ValidateStruct(escola); err != nil {
 		return err

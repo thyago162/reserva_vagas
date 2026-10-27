@@ -17,10 +17,11 @@ func NewEscolaHandler(s *Service) *EscolaHandler {
 }
 
 type CriarUpdateEscolaRequest struct {
-	Nome  string `json:"nome"`
-	Inep  string `json:"inep"`
-	Email string `json:"email"`
-	Sigla string `json:"sigla"`
+	Nome     string `json:"nome"`
+	Inep     string `json:"inep"`
+	Email    string `json:"email"`
+	Sigla    string `json:"sigla"`
+	Telefone string `json:"telefone"`
 }
 
 func (h *EscolaHandler) Criar(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
@@ -29,7 +30,7 @@ func (h *EscolaHandler) Criar(w http.ResponseWriter, r *http.Request) (interface
 		return nil, http.StatusBadRequest, err
 	}
 
-	err := h.service.SalvarEscola(req.Nome, req.Inep, req.Email, req.Sigla)
+	err := h.service.SalvarEscola(req.Nome, req.Inep, req.Email, req.Sigla, req.Telefone)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
@@ -78,7 +79,7 @@ func (h *EscolaHandler) Update(w http.ResponseWriter, r *http.Request) (interfac
 		return nil, http.StatusBadRequest, err
 	}
 
-	err := h.service.UpdateEscola(id, req.Nome, req.Inep, req.Email, req.Sigla)
+	err := h.service.UpdateEscola(id, req.Nome, req.Inep, req.Email, req.Sigla, req.Telefone)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
