@@ -1,6 +1,7 @@
 package escolas
 
 import (
+	"reserva_vagas/internal/enderecos"
 	"reserva_vagas/internalerrors"
 	"time"
 
@@ -18,6 +19,7 @@ type Escola struct {
 	UpdatedAt          time.Time            `gorm:"autoUpdateTime"`
 	EscolaridadeEscola []EscolaridadeEscola `gorm:"foreignKey:EscolaId"`
 	EscolaTurno        []EscolaTurno        `gorm:"foreignKey:EscolaId"`
+	Endereco           *enderecos.Endereco  `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
 }
 
 func NewEscola(nome string, inep string, email string, sigla string, telefone string) (*Escola, error) {

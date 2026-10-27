@@ -3,6 +3,8 @@ package escolas
 import (
 	"encoding/json"
 	"net/http"
+	"reserva_vagas/internal/enderecos"
+	"reserva_vagas/internal/importacao"
 	"reserva_vagas/internalerrors"
 
 	"github.com/go-chi/chi"
@@ -17,11 +19,12 @@ func NewEscolaHandler(s *Service) *EscolaHandler {
 }
 
 type CriarUpdateEscolaRequest struct {
-	Nome     string `json:"nome"`
-	Inep     string `json:"inep"`
-	Email    string `json:"email"`
-	Sigla    string `json:"sigla"`
-	Telefone string `json:"telefone"`
+	Nome     string             `json:"nome"`
+	Inep     string             `json:"inep"`
+	Email    string             `json:"email"`
+	Sigla    string             `json:"sigla"`
+	Telefone string             `json:"telefone"`
+	Endereco enderecos.Endereco `json:"endereco"`
 }
 
 func (h *EscolaHandler) Criar(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
@@ -30,7 +33,19 @@ func (h *EscolaHandler) Criar(w http.ResponseWriter, r *http.Request) (interface
 		return nil, http.StatusBadRequest, err
 	}
 
-	err := h.service.SalvarEscola(req.Nome, req.Inep, req.Email, req.Sigla, req.Telefone)
+	inputEndereco := enderecos.CreateEnderecoInput{
+		TipoLogradouro: req.Endereco.TipoLogradouro,
+		Logradouro:     req.Endereco.Logradouro,
+		Numero:         req.Endereco.Numero,
+		Complemento:    req.Endereco.Complemento,
+		Bairro:         req.Endereco.Bairro,
+		Cidade:         req.Endereco.Cidade,
+		Uf:             req.Endereco.Uf,
+		Cep:            req.Endereco.Cep,
+		Latitude:       req.Endereco.Latitude,
+		Longitude:      req.Endereco.Longitude,
+	}
+	err := h.service.SalvarEscola(req.Nome, req.Inep, req.Email, req.Sigla, req.Telefone, inputEndereco)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
@@ -99,4 +114,30 @@ func (h *EscolaHandler) Destroy(w http.ResponseWriter, r *http.Request) (interfa
 	}
 
 	return map[string]string{"message": "Escola atualizada com sucesso"}, http.StatusOK, nil
+}
+
+func (h *EscolaHandler) ImportarEmLotes(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+	defer file.Close()
+
+	escolas, err := importacao.LerCsvEscolas(file)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	err = h.service.ImportarEscolas(escolas)
+	if err != nil {
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return map[string]string{"message": "Escolas importadas com sucesso"}, http.StatusOK, nil
+
 }

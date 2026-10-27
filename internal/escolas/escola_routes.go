@@ -20,7 +20,7 @@ func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepo
 		r.Get("/{id}", http.HandlerErro(handler.Show))
 		r.Put("/{id}", http.HandlerErro(handler.Update))
 		r.Delete("/{id}", http.HandlerErro(handler.Destroy))
-
+		r.Post("/importar", http.HandlerErro(handler.ImportarEmLotes))
 	})
 
 	r.Route("/escolaridade-escola", func(r chi.Router) {
