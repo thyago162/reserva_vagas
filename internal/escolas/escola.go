@@ -2,6 +2,7 @@ package escolas
 
 import (
 	"reserva_vagas/internal/enderecos"
+	vagasescolares "reserva_vagas/internal/vagas_escolares"
 	"reserva_vagas/internalerrors"
 	"time"
 
@@ -9,20 +10,21 @@ import (
 )
 
 type Escola struct {
-	Id                 string               `gorm:"primaryKey;size:36"`
-	Nome               string               `validate:"min=5,max=150,required"`
-	Inep               string               `validate:"min=6,required"`
-	Email              string               `validate:"email,required"`
-	Sigla              string               `validate:"required,max=10"`
-	Telefone           string               `validate:"required,max=15"`
-	CreatedAt          time.Time            `gorm:"autoCreateTime"`
-	UpdatedAt          time.Time            `gorm:"autoUpdateTime"`
-	EscolaridadeEscola []EscolaridadeEscola `gorm:"foreignKey:EscolaId"`
-	EscolaTurno        []EscolaTurno        `gorm:"foreignKey:EscolaId"`
-	Endereco           *enderecos.Endereco  `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
+	Id                 string                          `gorm:"primaryKey;size:36"`
+	Nome               string                          `validate:"min=5,max=150,required"`
+	Inep               string                          `validate:"min=6,required"`
+	Email              string                          `validate:"email,required"`
+	Sigla              string                          `validate:"required,max=10"`
+	Telefone           string                          `validate:"required,max=15"`
+	CreatedAt          time.Time                       `gorm:"autoCreateTime"`
+	UpdatedAt          time.Time                       `gorm:"autoUpdateTime"`
+	EscolaridadeEscola []EscolaridadeEscola            `gorm:"foreignKey:EscolaId"`
+	EscolaTurno        []EscolaTurno                   `gorm:"foreignKey:EscolaId"`
+	Endereco           *enderecos.Endereco             `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
+	VagasEscolares     []vagasescolares.VagasEscolares `gorm:"foreingKey:EscolaId"`
 }
 
-func NewEscola(nome string, inep string, email string, sigla string, telefone string) (*Escola, error) {
+func NewEscola(nome, inep, email, sigla, telefone string) (*Escola, error) {
 	escola := &Escola{
 		Id:       uuid.NewString(),
 		Nome:     nome,

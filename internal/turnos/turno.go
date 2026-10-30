@@ -7,12 +7,17 @@ import (
 )
 
 type Turno struct {
-	Id   string `gorm:"primaryKey"`
-	Nome string `validate:"required,min=5,max=10"`
+	Id     string `gorm:"primaryKey"`
+	Nome   string `validate:"required,min=5,max=10"`
+	Codigo string `validate:"required"`
 }
 
-func NewTurno(nome string) (*Turno, error) {
-	turno := &Turno{Id: uuid.New().String(), Nome: nome}
+func NewTurno(nome, codigo string) (*Turno, error) {
+	turno := &Turno{
+		Id:     uuid.New().String(),
+		Nome:   nome,
+		Codigo: codigo,
+	}
 
 	err := internalerrors.ValidateStruct(turno)
 	if err == nil {

@@ -117,27 +117,21 @@ func (h *EscolaHandler) Destroy(w http.ResponseWriter, r *http.Request) (interfa
 }
 
 func (h *EscolaHandler) ImportarEmLotes(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	err := r.ParseMultipartForm(10 << 20)
-	if err != nil {
+	var req []importacao.ImportacaoEscolaDTO
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
-	file, _, err := r.FormFile("file")
-	if err != nil {
-		return nil, http.StatusBadRequest, err
-	}
-	defer file.Close()
-
-	escolas, err := importacao.LerCsvEscolas(file)
-	if err != nil {
-		return nil, http.StatusBadRequest, err
+	// Validação básica se o lote veio vazio
+	if len(req) == 0 {
+		return map[string]string{"erro": "o lote de escolas está vazio"}, http.StatusBadRequest, nil
 	}
 
-	err = h.service.ImportarEscolas(escolas)
-	if err != nil {
-		return nil, http.StatusInternalServerError, err
-	}
+	resultadoImportacao := importacao.ImportarListaEscolasConcorrente(req, 10)
 
-	return map[string]string{"message": "Escolas importadas com sucesso"}, http.StatusOK, nil
+	return map[string]any{
+		"total_processados": len(req),
+		"detalhes":          resultadoImportacao,
+	}, http.StatusOK, nil
 
 }

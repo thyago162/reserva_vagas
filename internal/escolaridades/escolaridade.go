@@ -18,6 +18,7 @@ type EtapaEnsino struct {
 type Escolaridade struct {
 	Id            string       `gorm:"primaryKey"`
 	Nome          string       `validate:"required,max=50"`
+	Codigo        string       `validate:"required"`
 	CreatedAt     time.Time    `gorm:"autoCreateTime"`
 	UpdatedAt     time.Time    `gorm:"autoUpdateTime"`
 	EtapaEnsinoId string       `validate:"required" gorm:"type:varchar(36);not null"`
@@ -39,11 +40,12 @@ func NewEtapaEnsino(nome, sigla string) (*EtapaEnsino, error) {
 	return nil, err
 }
 
-func NewEscolaridade(nome string, etapaEnsinoId string) (*Escolaridade, error) {
+func NewEscolaridade(nome, etapaEnsinoId, codigo string) (*Escolaridade, error) {
 	escolaridade := &Escolaridade{
 		Id:            uuid.New().String(),
 		Nome:          nome,
 		EtapaEnsinoId: etapaEnsinoId,
+		Codigo:        codigo,
 	}
 
 	err := internalerrors.ValidateStruct(escolaridade)
