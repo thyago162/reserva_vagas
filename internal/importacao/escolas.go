@@ -82,7 +82,7 @@ type VagasEscolares struct {
 type VagasDTO struct {
 	TurnoCodigo        string `json:"turno_codigo"`
 	EscolaridadeCodigo string `json:"escolaridade_codigo"`
-	Qtde               int32  `json:"quantidade"`
+	Qtde               int32  `json:"qtde"`
 	AnoLetivo          int32  `json:"ano_letivo"`
 }
 
@@ -356,6 +356,7 @@ func salvarVagasEscolares(tx *gorm.DB, escolaId string, escolaridadeMap, turnoMa
 	var pivos []VagasEscolares
 
 	for _, vagaDTO := range vagasDTO {
+		fmt.Println(vagaDTO.Qtde)
 		turnoId := turnoMap[vagaDTO.TurnoCodigo]
 		escolaridadeId := escolaridadeMap[vagaDTO.EscolaridadeCodigo]
 

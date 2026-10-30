@@ -9,11 +9,11 @@ import (
 
 type VagasEscolares struct {
 	Id             string    `gorm:"primaryKey;size:36"`
-	EscolaId       string    `gorm:"type:varchar(36);not null;uniqueIndex:idx_escola_id"`
-	EscolaridadeId string    `gorm:"type:varchar(36);not null;uniqueIndex:idx_escolaridade_id"`
-	TurnoId        string    `gorm:"type:varchar(36);not null;uniqueIndex:idx_turno_id"`
+	EscolaId       string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`
+	EscolaridadeId string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`
+	TurnoId        string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`
+	AnoLetivo      int32     `gorm:"type:int;not null;index:idx_vagas_escolares_composicao,unique"`
 	Qtde           int32     `gorm:"type:int"`
-	AnoLetivo      int32     `gorm:"type:int"`
 	CreatedAt      time.Time `gorm:"autoCreateTime"`
 	UpdatedAt      time.Time `gorm:"autoUpdateTime"`
 }
