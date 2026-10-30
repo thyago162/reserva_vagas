@@ -17,10 +17,10 @@ type Endereco struct {
 	Cidade         string    `validate:"required,max=50"`
 	Uf             string    `validate:"required,max=2"`
 	Cep            string    `validate:"required,max=9"`
-	Latitude       string    `validate:"max=20"`
-	Longitude      string    `validate:"max=20"`
-	EndereableID   string 	 `gorm:"index"`
-    EndereableType string 	 `gorm:"index"`
+	Latitude       float64   `validate:"required"`
+	Longitude      float64   `validate:"required"`
+	EndereableID   string    `gorm:"index"`
+	EndereableType string    `gorm:"index"`
 	CreatedAt      time.Time `gorm:"autoCreateTime"`
 	UpdatedAt      time.Time `gorm:"autoUpdateTime"`
 }
@@ -34,8 +34,8 @@ type CreateEnderecoInput struct {
 	Cidade         string
 	Uf             string
 	Cep            string
-	Latitude       string
-	Longitude      string
+	Latitude       float64
+	Longitude      float64
 	EndereableID   string
 	EndereableType string
 }

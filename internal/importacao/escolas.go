@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reserva_vagas/internalerrors"
+	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -12,13 +13,15 @@ import (
 var db *gorm.DB
 
 type Escola struct {
-	Id       string `gorm:"primaryKey;size:36"`
-	Nome     string
-	Inep     string
-	Email    string
-	Sigla    string
-	Telefone string
-	Endereco Endereco `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
+	Id        string `gorm:"primaryKey;size:36"`
+	Nome      string
+	Inep      string
+	Email     string
+	Sigla     string
+	Telefone  string
+	Endereco  Endereco `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type Endereco struct {
@@ -31,10 +34,12 @@ type Endereco struct {
 	Cidade         string
 	Uf             string
 	Cep            string
-	Latitude       string
-	Longitude      string
+	Latitude       float64
+	Longitude      float64
 	EndereableID   string `gorm:"size:36"`
 	EndereableType string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type Escolaridade struct {
@@ -51,21 +56,27 @@ type EscolaridadeEscola struct {
 	Id             string `gorm:"primaryKey;size:36"`
 	EscolaId       string
 	EscolaridadeId string
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type EscolaTurno struct {
-	Id       string `gorm:"primaryKey;size:36"`
-	EscolaId string
-	TurnoId  string
+	Id        string `gorm:"primaryKey;size:36"`
+	EscolaId  string
+	TurnoId   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
-type VagaEscolar struct {
+type VagasEscolares struct {
 	Id             string `gorm:"primaryKey;size:36"`
 	EscolaId       string
 	EscolaridadeId string
 	TurnoId        string
 	Qtde           int32
 	AnoLetivo      int32
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type VagasDTO struct {
@@ -89,8 +100,8 @@ type ImportacaoEscolaDTO struct {
 	Cidade               string     `json:"cidade" validate:"required,max=50"`
 	Uf                   string     `json:"uf" validate:"required,len=2"`
 	Cep                  string     `json:"cep" validate:"required,max=9"`
-	Latitude             string     `json:"latitude" validate:"max=20"`
-	Longitude            string     `json:"longitude" validate:"max=20"`
+	Latitude             float64    `json:"latitude" validate:"required"`
+	Longitude            float64    `json:"longitude" validate:"required"`
 	EscolaridadesCodigos []string   `json:"escolaridades_codigos"`
 	TurnosCodigos        []string   `json:"turnos_codigos"`
 	Vagas                []VagasDTO `json:"vagas"`
@@ -176,8 +187,8 @@ func NewEscolaTurno(escolaId, turnoId string) (*EscolaTurno, error) {
 	return escolaTurno, nil
 }
 
-func NewVagaEscolar(escolaId, escolaridadeId, turnoId string, qtde, anoLetivo int32) (*VagaEscolar, error) {
-	vagaEscolar := &VagaEscolar{
+func NewVagaEscolar(escolaId, escolaridadeId, turnoId string, qtde, anoLetivo int32) (*VagasEscolares, error) {
+	vagaEscolar := &VagasEscolares{
 		Id:             uuid.New().String(),
 		EscolaId:       escolaId,
 		EscolaridadeId: escolaridadeId,
@@ -342,7 +353,7 @@ func salvarVagasEscolares(tx *gorm.DB, escolaId string, escolaridadeMap, turnoMa
 		return nil
 	}
 
-	var pivos []VagaEscolar
+	var pivos []VagasEscolares
 
 	for _, vagaDTO := range vagasDTO {
 		turnoId := turnoMap[vagaDTO.TurnoCodigo]

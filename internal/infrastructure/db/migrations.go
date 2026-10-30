@@ -18,6 +18,7 @@ var models = []any{
 	&escolas.EscolaridadeEscola{},
 	&enderecos.Endereco{},
 	&vagasescolares.VagasEscolares{},
+	&escolas.EscolaTurno{},
 }
 
 func RunMigrations(db *gorm.DB) error {
