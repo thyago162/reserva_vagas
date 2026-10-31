@@ -4,6 +4,7 @@ import (
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db/repositories"
+	vagasescolares "reserva_vagas/internal/vagas_escolares"
 
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"
@@ -24,4 +25,10 @@ func InitRoutes(r chi.Router, database *gorm.DB) {
 	// ==========================================
 	repoEscolaridade := repositories.NewEscolaridadeRepositoryDb(database)
 	escolaridades.RegisterRoutes(r, repoEscolaridade)
+
+	// ========================================================
+	// Módul: Vagas Escolares
+	// =========================================================
+	repo := repositories.NewVagasEscolaresRepository(database)
+	vagasescolares.RegisterRoutes(r, repo)
 }
