@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	vagasescolares "reserva_vagas/internal/vagas_escolares"
+	"reserva_vagas/internal/vagasescolares"
 
 	"gorm.io/gorm"
 )

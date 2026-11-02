@@ -4,8 +4,9 @@ import (
 	"reserva_vagas/internal/enderecos"
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
+	"reserva_vagas/internal/reservas"
 	"reserva_vagas/internal/turnos"
-	vagasescolares "reserva_vagas/internal/vagas_escolares"
+	"reserva_vagas/internal/vagasescolares"
 
 	"gorm.io/gorm"
 )
@@ -19,6 +20,7 @@ var models = []any{
 	&enderecos.Endereco{},
 	&vagasescolares.VagasEscolares{},
 	&escolas.EscolaTurno{},
+	&reservas.Reserva{},
 }
 
 func RunMigrations(db *gorm.DB) error {

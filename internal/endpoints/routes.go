@@ -4,7 +4,7 @@ import (
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db/repositories"
-	vagasescolares "reserva_vagas/internal/vagas_escolares"
+	"reserva_vagas/internal/vagasescolares"
 
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"

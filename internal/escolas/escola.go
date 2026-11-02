@@ -2,7 +2,7 @@ package escolas
 
 import (
 	"reserva_vagas/internal/enderecos"
-	vagasescolares "reserva_vagas/internal/vagas_escolares"
+	"reserva_vagas/internal/vagasescolares"
 	"reserva_vagas/internalerrors"
 	"time"
 
