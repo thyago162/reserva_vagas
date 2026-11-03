@@ -37,7 +37,7 @@ type Reserva struct {
 	Candidato      *candidato.Candidato           `gorm:"foreignKey:CandidatoId"`
 }
 
-func NewReserva(escolaId, escolaridadeId, turnoId, vagaId, candidatoId string) *Reserva {
+func NewReserva(escolaId, escolaridadeId, turnoId, vagaId, candidatoId string) (*Reserva, error) {
 	reserva := &Reserva{
 		EscolaId:       escolaId,
 		EscolaridadeId: escolaridadeId,
@@ -49,8 +49,8 @@ func NewReserva(escolaId, escolaridadeId, turnoId, vagaId, candidatoId string) *
 
 	err := internalerrors.ValidateStruct(reserva)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return reserva
+	return reserva, nil
 }

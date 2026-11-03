@@ -44,18 +44,17 @@ func (r *ReservaRepository) Show(id string) (*reservas.Reserva, error) {
 	return &reserva, nil
 }
 
-// Update updates an existing reserva in the database.
-func (r *ReservaRepository) Update(reserva *reservas.Reserva) error {
-	if err := r.db.Save(reserva).Error; err != nil {
+// Destroy removes a reserva from the database.
+func (r *ReservaRepository) Destroy(id string) error {
+	if err := r.db.Delete(&reservas.Reserva{}, "id = ?", id).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-// Destroy removes a reserva from the database.
-func (r *ReservaRepository) Destroy(id string) error {
-	if err := r.db.Delete(&reservas.Reserva{}, "id = ?", id).Error; err != nil {
+func (r *ReservaRepository) StoreWithTx(tx *gorm.DB, reserva *reservas.Reserva) error {
+	if err := tx.Create(reserva).Error; err != nil {
 		return err
 	}
 

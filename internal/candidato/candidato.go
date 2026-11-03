@@ -19,7 +19,7 @@ type Candidato struct {
 	UpdatedAt               time.Time `gorm:"autoCreateTime"`
 }
 
-type CreateCandidatoInput struct {
+type CreateCandidatoDTO struct {
 	Nome                    string
 	Cpf                     string
 	DtNascimento            string
@@ -30,7 +30,7 @@ type CreateCandidatoInput struct {
 	EmailResponavel         string
 }
 
-func NewCandidato(createCandidatoInput CreateCandidatoInput) (*Candidato, error) {
+func NewCandidato(createCandidatoInput CreateCandidatoDTO) (*Candidato, error) {
 	candidato := &Candidato{
 		Nome:                    createCandidatoInput.Nome,
 		Cpf:                     createCandidatoInput.Cpf,

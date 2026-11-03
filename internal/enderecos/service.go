@@ -13,10 +13,10 @@ func (s Service) SalvarEndereco(input CreateEnderecoInput) error {
 	if err != nil {
 		return err
 	}
-	
+
 	if err := s.repo.Store(endereco); err != nil {
 		return err
 	}
-	
+
 	return nil
 }

@@ -14,7 +14,12 @@ func (s *Service) Index() ([]*Candidato, error) {
 	return s.repo.Index()
 }
 
-func (s *Service) Store(candidato *Candidato) error {
+func (s *Service) Store(candidatoDto *CreateCandidatoDTO) error {
+	candidato, err := NewCandidato(*candidatoDto)
+	if err != nil {
+		return err
+	}
+
 	return s.repo.Store(candidato)
 }
 
