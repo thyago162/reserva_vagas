@@ -8,6 +8,8 @@ import (
 	"reserva_vagas/internal/vagasescolares"
 	"reserva_vagas/internalerrors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // 1. Defina um tipo customizado para a situação
@@ -39,6 +41,7 @@ type Reserva struct {
 
 func NewReserva(escolaId, escolaridadeId, turnoId, vagaId, candidatoId string) (*Reserva, error) {
 	reserva := &Reserva{
+		Id:             uuid.NewString(),
 		EscolaId:       escolaId,
 		EscolaridadeId: escolaridadeId,
 		TurnoId:        turnoId,

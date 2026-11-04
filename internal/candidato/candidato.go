@@ -3,10 +3,12 @@ package candidato
 import (
 	"reserva_vagas/internalerrors"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Candidato struct {
-	Id                      string    `gorm:"primaryKey;size:36"`
+	Id                      string    `gorm:"primaryKey;size:36;column:id"`
 	Nome                    string    `validate:"min=15,max=250,required"`
 	Cpf                     string    `validate:"min=11,max=11,required"`
 	DtNascimento            string    `validate:"required"`
@@ -32,6 +34,7 @@ type CreateCandidatoDTO struct {
 
 func NewCandidato(createCandidatoInput CreateCandidatoDTO) (*Candidato, error) {
 	candidato := &Candidato{
+		Id:                      uuid.NewString(),
 		Nome:                    createCandidatoInput.Nome,
 		Cpf:                     createCandidatoInput.Cpf,
 		DtNascimento:            createCandidatoInput.DtNascimento,

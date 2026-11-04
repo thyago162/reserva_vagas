@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"reserva_vagas/internal/candidato"
 
 	"gorm.io/gorm"
@@ -35,6 +36,19 @@ func (r *CandidatoRepository) Store(candidato *candidato.Candidato) error {
 	return tx.Error
 }
 
+func (r *CandidatoRepository) StoreWithTx(tx any, candidato *candidato.Candidato) error {
+	gormTx, ok := tx.(*gorm.DB)
+	if !ok {
+		return errors.New("transação inválida ou tipo incorreto")
+	}
+
+	if err := gormTx.Create(candidato).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Show retrieves a candidato by its ID from the database.
 func (r *CandidatoRepository) Show(id string) (*candidato.Candidato, error) {
 	candidato := &candidato.Candidato{}
@@ -54,7 +68,7 @@ func (r *CandidatoRepository) Update(candidato *candidato.Candidato) error {
 }
 
 // Delete removes a candidato from the database by its ID.
-func (r *CandidatoRepository) Delete(id string) error {
+func (r *CandidatoRepository) Destroy(id string) error {
 	var candidato candidato.Candidato
 	tx := r.Db.Where("id = ?", id).Delete(&candidato)
 

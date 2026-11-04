@@ -6,5 +6,5 @@ type Repository interface {
 	StoreWithTx(tx any, candidato *Candidato) error
 	Show(id string) (*Candidato, error)
 	Update(candidato *Candidato) error
-	Delete(id string) error
+	Destroy(id string) error
 }

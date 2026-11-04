@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"errors"
 	"reserva_vagas/internal/reservas"
 
 	"gorm.io/gorm"
@@ -26,7 +27,18 @@ func (r *ReservaRepository) Index() ([]*reservas.Reserva, error) {
 
 // Store saves a new reserva to the database.
 func (r *ReservaRepository) Store(reserva *reservas.Reserva) error {
-	if err := r.db.Create(reserva).Error; err != nil {
+	tx := r.db.Create(reserva)
+
+	return tx.Error
+}
+
+func (r *ReservaRepository) StoreWithTx(tx any, reserva *reservas.Reserva) error {
+	gormTx, ok := tx.(*gorm.DB)
+	if !ok {
+		return errors.New("transação inválida ou tipo incorreto")
+	}
+
+	if err := gormTx.Create(reserva).Error; err != nil {
 		return err
 	}
 
@@ -47,14 +59,6 @@ func (r *ReservaRepository) Show(id string) (*reservas.Reserva, error) {
 // Destroy removes a reserva from the database.
 func (r *ReservaRepository) Destroy(id string) error {
 	if err := r.db.Delete(&reservas.Reserva{}, "id = ?", id).Error; err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (r *ReservaRepository) StoreWithTx(tx *gorm.DB, reserva *reservas.Reserva) error {
-	if err := tx.Create(reserva).Error; err != nil {
 		return err
 	}
 

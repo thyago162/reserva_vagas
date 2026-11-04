@@ -32,5 +32,5 @@ func (s *Service) Update(candidato *Candidato) error {
 }
 
 func (s *Service) Delete(id string) error {
-	return s.repo.Delete(id)
+	return s.repo.Destroy(id)
 }
