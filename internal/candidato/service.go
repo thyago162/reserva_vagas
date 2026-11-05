@@ -34,3 +34,7 @@ func (s *Service) Update(candidato *Candidato) error {
 func (s *Service) Delete(id string) error {
 	return s.repo.Destroy(id)
 }
+
+func (s *Service) FindByCpf(cpf string) (*Candidato, error) {
+	return s.repo.FindByCpf(cpf)
+}

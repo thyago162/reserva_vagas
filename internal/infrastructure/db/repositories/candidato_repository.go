@@ -74,3 +74,10 @@ func (r *CandidatoRepository) Destroy(id string) error {
 
 	return tx.Error
 }
+
+func (r *CandidatoRepository) FindByCpf(cpf string) (*candidato.Candidato, error) {
+	candidato := &candidato.Candidato{}
+	tx := r.Db.Where("cpf = ?", cpf).First(&candidato).Error
+
+	return candidato, tx
+}
