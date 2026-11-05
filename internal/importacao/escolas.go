@@ -69,20 +69,22 @@ type EscolaTurno struct {
 }
 
 type VagasEscolares struct {
-	Id             string `gorm:"primaryKey;size:36"`
-	EscolaId       string
-	EscolaridadeId string
-	TurnoId        string
-	Qtde           int32
-	AnoLetivo      int32
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
+	Id               string `gorm:"primaryKey;size:36"`
+	EscolaId         string
+	EscolaridadeId   string
+	TurnoId          string
+	VagasTotais      int32
+	VagasDisponiveis int32
+	VagasReservadas  int32
+	AnoLetivo        int32
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 type VagasDTO struct {
 	TurnoCodigo        string `json:"turno_codigo"`
 	EscolaridadeCodigo string `json:"escolaridade_codigo"`
-	Qtde               int32  `json:"qtde"`
+	VagasTotais        int32  `json:"vagas_totais"`
 	AnoLetivo          int32  `json:"ano_letivo"`
 }
 
@@ -187,14 +189,16 @@ func NewEscolaTurno(escolaId, turnoId string) (*EscolaTurno, error) {
 	return escolaTurno, nil
 }
 
-func NewVagaEscolar(escolaId, escolaridadeId, turnoId string, qtde, anoLetivo int32) (*VagasEscolares, error) {
+func NewVagaEscolar(escolaId, escolaridadeId, turnoId string, vagasTotais, anoLetivo int32) (*VagasEscolares, error) {
 	vagaEscolar := &VagasEscolares{
-		Id:             uuid.New().String(),
-		EscolaId:       escolaId,
-		EscolaridadeId: escolaridadeId,
-		TurnoId:        turnoId,
-		Qtde:           qtde,
-		AnoLetivo:      anoLetivo,
+		Id:               uuid.New().String(),
+		EscolaId:         escolaId,
+		EscolaridadeId:   escolaridadeId,
+		TurnoId:          turnoId,
+		VagasTotais:      vagasTotais,
+		VagasDisponiveis: vagasTotais,
+		VagasReservadas:  0,
+		AnoLetivo:        anoLetivo,
 	}
 
 	err := internalerrors.ValidateStruct(vagaEscolar)
@@ -356,7 +360,6 @@ func salvarVagasEscolares(tx *gorm.DB, escolaId string, escolaridadeMap, turnoMa
 	var pivos []VagasEscolares
 
 	for _, vagaDTO := range vagasDTO {
-		fmt.Println(vagaDTO.Qtde)
 		turnoId := turnoMap[vagaDTO.TurnoCodigo]
 		escolaridadeId := escolaridadeMap[vagaDTO.EscolaridadeCodigo]
 
@@ -364,7 +367,7 @@ func salvarVagasEscolares(tx *gorm.DB, escolaId string, escolaridadeMap, turnoMa
 			return fmt.Errorf("turno ou escolaridade inválido na vaga")
 		}
 
-		pivo, err := NewVagaEscolar(escolaId, escolaridadeId, turnoId, vagaDTO.Qtde, vagaDTO.AnoLetivo)
+		pivo, err := NewVagaEscolar(escolaId, escolaridadeId, turnoId, vagaDTO.VagasTotais, vagaDTO.AnoLetivo)
 		if err != nil {
 			return err
 		}

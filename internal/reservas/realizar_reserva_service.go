@@ -2,7 +2,6 @@ package reservas
 
 import (
 	"errors"
-	"fmt"
 	"reserva_vagas/internal/candidato"
 	"reserva_vagas/internal/enderecos"
 
@@ -110,8 +109,6 @@ func salvarCandidato(
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(candidato)
 
 	err = candRepo.StoreWithTx(tx, candidato)
 	if err != nil {

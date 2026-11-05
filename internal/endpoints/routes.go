@@ -4,6 +4,7 @@ import (
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db/repositories"
+	"reserva_vagas/internal/login"
 	"reserva_vagas/internal/reservas"
 	"reserva_vagas/internal/vagasescolares"
 
@@ -41,4 +42,11 @@ func InitRoutes(r chi.Router, database *gorm.DB) {
 	resRepo := repositories.NewReservaRepository(database)
 
 	reservas.RegisterRoutes(r, database, candRepo, endRepo, resRepo)
+
+	// ========================================================================
+	// Módulo: Login
+	// ========================================================================
+	userRepo := repositories.NewUsuarioRepository(database)
+	login.RegisterRoutes(r, userRepo)
+
 }

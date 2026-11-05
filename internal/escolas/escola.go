@@ -21,7 +21,7 @@ type Escola struct {
 	EscolaridadeEscola []EscolaridadeEscola            `gorm:"foreignKey:EscolaId"`
 	EscolaTurno        []EscolaTurno                   `gorm:"foreignKey:EscolaId"`
 	Endereco           *enderecos.Endereco             `gorm:"polymorphic:Endereable;polymorphicValue:escola"`
-	VagasEscolares     []vagasescolares.VagasEscolares `gorm:"foreingKey:EscolaId"`
+	VagasEscolares     []vagasescolares.VagasEscolares `gorm:"foreignKey:EscolaId"`
 }
 
 func NewEscola(nome, inep, email, sigla, telefone string) (*Escola, error) {

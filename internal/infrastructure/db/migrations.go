@@ -6,6 +6,7 @@ import (
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/reservas"
 	"reserva_vagas/internal/turnos"
+	"reserva_vagas/internal/usuario"
 	"reserva_vagas/internal/vagasescolares"
 
 	"gorm.io/gorm"
@@ -21,6 +22,7 @@ var models = []any{
 	&vagasescolares.VagasEscolares{},
 	&escolas.EscolaTurno{},
 	&reservas.Reserva{},
+	&usuario.Usuario{},
 }
 
 func RunMigrations(db *gorm.DB) error {

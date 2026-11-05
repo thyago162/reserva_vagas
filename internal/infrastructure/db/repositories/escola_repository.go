@@ -23,7 +23,10 @@ func (e *EscolaRepositoryDb) Store(escola *escolas.Escola) error {
 
 func (e *EscolaRepositoryDb) Index() ([]*escolas.Escola, error) {
 	var escolasLista []*escolas.Escola
-	tx := e.Db.Preload("Endereco").Find(&escolasLista)
+	tx := e.Db.
+		Preload("Endereco").
+		Preload("VagasEscolares").
+		Find(&escolasLista)
 
 	return escolasLista, tx.Error
 }
