@@ -9,4 +9,5 @@ type Repository interface {
 	Update(escola *Escola) error
 	Destroy(id string) error
 	ImportarEmLotes(escolas []importacao.Escola) error
+	GetByEscolaByCodigo(codigo string) ([]*Escola, error)
 }

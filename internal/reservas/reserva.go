@@ -23,12 +23,12 @@ const (
 )
 
 type Reserva struct {
-	Id             string                         `gorm:"primaryKey;size:36"`
-	EscolaId       string                         `gorm:"size:36"`
-	EscolaridadeId string                         `gorm:"size:36"`
-	TurnoId        string                         `gorm:"size:36"`
-	VagaId         string                         `gorm:"size:36"`
-	CandidatoId    string                         `gorm:"size:36"`
+	Id             string                         `gorm:"primaryKey;size:36;not null"`
+	EscolaId       string                         `gorm:"size:36;not null"`
+	EscolaridadeId string                         `gorm:"size:36;not null"`
+	TurnoId        string                         `gorm:"size:36;not null"`
+	VagaId         string                         `gorm:"size:36;not null"`
+	CandidatoId    string                         `gorm:"size:36;not null"`
 	Situacao       SituacaoReserva                `gorm:"type:enum('PENDENTE', 'CONFIRMADA', 'CANCELADA');default:'PENDENTE'"`
 	CreatedAt      time.Time                      `gorm:"autoCreateTime"`
 	UpdatedAt      time.Time                      `gorm:"autoCreateTime"`

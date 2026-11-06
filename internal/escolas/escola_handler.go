@@ -2,10 +2,12 @@ package escolas
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"reserva_vagas/internal/enderecos"
 	"reserva_vagas/internal/importacao"
 	"reserva_vagas/internalerrors"
+	"strconv"
 
 	"github.com/go-chi/chi"
 )
@@ -133,5 +135,29 @@ func (h *EscolaHandler) ImportarEmLotes(w http.ResponseWriter, r *http.Request) 
 		"total_processados": len(req),
 		"detalhes":          resultadoImportacao,
 	}, http.StatusOK, nil
+}
 
+func (h *EscolaHandler) GetEscolasByDtNascimento(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	dtNascimento := r.URL.Query().Get("dt_nascimento")
+	if dtNascimento == "" {
+		return nil, http.StatusBadRequest, internalerrors.ErrValidation
+	}
+
+	// Converte e valida na mesma linha
+	lat, err := strconv.ParseFloat(r.URL.Query().Get("latitude"), 64)
+	if err != nil {
+		return nil, http.StatusBadRequest, fmt.Errorf("latitude inválida: %w", internalerrors.ErrValidation)
+	}
+
+	lon, err := strconv.ParseFloat(r.URL.Query().Get("longitude"), 64)
+	if err != nil {
+		return nil, http.StatusBadRequest, fmt.Errorf("longitude inválida: %w", internalerrors.ErrValidation)
+	}
+
+	escolasDb, err := h.service.GetEscolasByDtNascimento(dtNascimento, lat, lon)
+	if err != nil {
+		return nil, http.StatusBadRequest, err
+	}
+
+	return escolasDb, http.StatusOK, nil
 }

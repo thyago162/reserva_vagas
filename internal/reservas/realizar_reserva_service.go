@@ -39,7 +39,7 @@ type CriarReservaDTO struct {
 	EmailResponsavel        string  `json:"email_responsavel"`
 	TipoLogradouro          string  `json:"tipo_logradouro"`
 	Logradouro              string  `json:"logradouro"`
-	Numero                  string  `json:"numero"`
+	Numero                  *string `json:"numero"`
 	Complemento             string  `json:"complemento"`
 	Bairro                  string  `json:"bairro"`
 	Cidade                  string  `json:"cidade"`

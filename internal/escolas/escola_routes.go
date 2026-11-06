@@ -19,10 +19,12 @@ func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepo
 	r.Route("/escolas", func(r chi.Router) {
 
 		// =================================================================================
-		//  Rotas públicas
+		//  Rotas MCP Server
 		// =================================================================================
-		r.Get("/", http.HandlerErro(handler.Index))
-		r.Get("/{id}", http.HandlerErro(handler.Show))
+		r.Use(auth.AuthMiddleware)
+		r.Use(auth.RequireRole(usuario.Mcp))
+
+		r.Get("/get-escolas-dt-nascimento", http.HandlerErro(handler.GetEscolasByDtNascimento))
 
 		// ===========================================================================
 		// Rotas protegidas
@@ -39,6 +41,9 @@ func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepo
 			// Rotas do Admin e Escola
 			r.Use(auth.RequireRole(usuario.Admin, usuario.Escola))
 
+			// ======================================== ROTAS ========================================
+
+			r.Get("/{id}", http.HandlerErro(handler.Show))
 			r.Put("/{id}", http.HandlerErro(handler.Update))
 		})
 
@@ -51,6 +56,7 @@ func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepo
 			r.Use(auth.AuthMiddleware)
 			r.Use(auth.RequireRole(usuario.Admin))
 
+			r.Get("/", http.HandlerErro(handler.Index))
 			r.Post("/", http.HandlerErro(handler.Criar))
 			r.Post("/importar", http.HandlerErro(handler.ImportarEmLotes))
 			r.Delete("/{id}", http.HandlerErro(handler.Destroy))

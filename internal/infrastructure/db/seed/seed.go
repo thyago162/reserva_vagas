@@ -7,5 +7,6 @@ func Seed(db *gorm.DB) {
 	EtapaEnsinoSeed(db)
 	EscolaridadeSeed(db)
 	TurnoSeed(db)
-	CriarAdmin(db)
+	CriarAdminUser(db)
+	CriarMCPUser(db)
 }

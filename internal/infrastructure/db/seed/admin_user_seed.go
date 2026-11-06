@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CriarAdmin(db *gorm.DB) {
+func CriarAdminUser(db *gorm.DB) {
 	email := "admin@domain.com"
 	var adminExiste usuario.Usuario
 
@@ -23,12 +23,12 @@ func CriarAdmin(db *gorm.DB) {
 	role := usuario.Admin
 	senhaText := gerarStringAleatoria(10)
 	fmt.Printf("Utilize a senha %s para realizar login no sistema, após o primeiro login a senha precisará ser redefinida.", senhaText)
-	admin, err := usuario.NewUsuario(email, senhaText, role)
+	admin_user, err := usuario.NewUsuario(email, senhaText, role)
 	if err != nil {
 		log.Fatal("Erro na validação de dados do usuário")
 	}
 
-	db.Create(&admin)
+	db.Create(&admin_user)
 }
 
 func gerarStringAleatoria(n int) string {

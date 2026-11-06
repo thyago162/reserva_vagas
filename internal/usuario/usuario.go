@@ -13,13 +13,14 @@ const (
 	Admin  TipoRole = "ADMIN"
 	Escola TipoRole = "ESCOLA"
 	User   TipoRole = "USER"
+	Mcp    TipoRole = "MCP"
 )
 
 type Usuario struct {
-	Id        string    `gorm:"primaryKey;size:36"`
+	Id        string    `gorm:"primaryKey;size:36;not null"`
 	Email     string    `gorm:"unique;not null"`
 	Senha     string    `gorm:"not null"`
-	Role      TipoRole  `gorm:"type:enum('ADMIN', 'ESCOLA', 'USER');default:'USER'"`
+	Role      TipoRole  `gorm:"type:enum('ADMIN', 'ESCOLA', 'USER', 'MCP');default:'USER'"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 	UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }

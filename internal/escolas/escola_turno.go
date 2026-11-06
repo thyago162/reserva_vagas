@@ -9,7 +9,7 @@ import (
 )
 
 type EscolaTurno struct {
-	Id        string        `gorm:"primaryKey;size:36"`
+	Id        string        `gorm:"primaryKey;size:36;not null"`
 	EscolaId  string        `gorm:"type:varchar(36);size:36;not null;index:idx_escola_turno,unique"`
 	TurnoId   string        `gorm:"type:varchar(36);size:36;not null;index:idx_escola_turno,unique"`
 	CreatedAt time.Time     `gorm:"autoCreateTime"`

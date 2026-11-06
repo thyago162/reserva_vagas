@@ -9,7 +9,7 @@ import (
 )
 
 type EscolaridadeEscola struct {
-	Id             string                      `gorm:"primaryKey;size:36"`
+	Id             string                      `gorm:"primaryKey;size:36;not null"`
 	EscolaId       string                      `gorm:"type:varchar(36);not null;uniqueIndex:idx_escola_escolaridade"`
 	EscolaridadeId string                      `gorm:"size:36;not null;uniqueIndex:idx_escola_escolaridade"`
 	CreatedAt      time.Time                   `gorm:"autoCreateTime"`

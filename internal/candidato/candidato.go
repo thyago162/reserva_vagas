@@ -9,14 +9,14 @@ import (
 
 type Candidato struct {
 	Id                      string    `gorm:"primaryKey;size:36;column:id"`
-	Nome                    string    `validate:"min=15,max=250,required"`
-	Cpf                     string    `validate:"min=11,max=11,required"`
-	DtNascimento            string    `validate:"required"`
-	NomeResponsavel         string    `validate:"min=15,max=250,required"`
-	CpfResponsavel          string    `validate:"min=11,max=11,required"`
-	Telefone                string    `validate:"required,max=15"`
-	DtNascimentoResponsavel string    `validate:"required"`
-	EmailResponavel         string    `validate:"required"`
+	Nome                    string    `validate:"min=15,max=250,required" gorm:"not null"`
+	Cpf                     string    `validate:"min=11,max=11,required" gorm:"not null"`
+	DtNascimento            time.Time `validate:"required" gorm:"not null"`
+	NomeResponsavel         string    `validate:"min=15,max=250,required" gorm:"not null"`
+	CpfResponsavel          string    `validate:"min=11,max=11,required" gorm:"not null"`
+	Telefone                string    `validate:"max=15"`
+	DtNascimentoResponsavel time.Time `validate:"required" gorm:"not null"`
+	EmailResponavel         string    `validate:"required" gorm:"not null"`
 	CreatedAt               time.Time `gorm:"autoCreateTime"`
 	UpdatedAt               time.Time `gorm:"autoCreateTime"`
 }
@@ -33,15 +33,26 @@ type CreateCandidatoDTO struct {
 }
 
 func NewCandidato(createCandidatoInput CreateCandidatoDTO) (*Candidato, error) {
+	layoutBR := "02/01/2006"
+	dtNascimento, err := time.Parse(layoutBR, createCandidatoInput.DtNascimento)
+	if err != nil {
+		return nil, err
+	}
+
+	dtNascimentoRes, err := time.Parse(layoutBR, createCandidatoInput.DtNascimentoResponsavel)
+	if err != nil {
+		return nil, err
+	}
+
 	candidato := &Candidato{
 		Id:                      uuid.NewString(),
 		Nome:                    createCandidatoInput.Nome,
 		Cpf:                     createCandidatoInput.Cpf,
-		DtNascimento:            createCandidatoInput.DtNascimento,
+		DtNascimento:            dtNascimento,
 		NomeResponsavel:         createCandidatoInput.NomeResponsavel,
 		CpfResponsavel:          createCandidatoInput.CpfResponsavel,
 		Telefone:                createCandidatoInput.Telefone,
-		DtNascimentoResponsavel: createCandidatoInput.DtNascimentoResponsavel,
+		DtNascimentoResponsavel: dtNascimentoRes,
 		EmailResponavel:         createCandidatoInput.EmailResponavel,
 	}
 

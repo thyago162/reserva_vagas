@@ -8,7 +8,7 @@ import (
 )
 
 type VagasEscolares struct {
-	Id               string    `gorm:"primaryKey;size:36"`
+	Id               string    `gorm:"primaryKey;size:36;not null"`
 	EscolaId         string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`
 	EscolaridadeId   string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`
 	TurnoId          string    `gorm:"type:varchar(36);size:36;not null;index:idx_vagas_escolares_composicao,unique"`

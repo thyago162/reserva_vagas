@@ -9,18 +9,18 @@ import (
 
 type Endereco struct {
 	Id             string    `gorm:"primaryKey;size:36"`
-	TipoLogradouro string    `validate:"required,max=50"`
-	Logradouro     string    `validate:"required,max=150"`
-	Numero         string    `validate:"required,max=10"`
+	TipoLogradouro string    `validate:"required,max=50" gorm:"not null"`
+	Logradouro     string    `validate:"required,max=150" gorm:"not null"`
+	Numero         *string   `validate:"max=10" gorm:"default:'S/N'"`
 	Complemento    string    `validate:"max=50"`
-	Bairro         string    `validate:"required,max=50"`
-	Cidade         string    `validate:"required,max=50"`
-	Uf             string    `validate:"required,max=2"`
-	Cep            string    `validate:"required,max=9"`
-	Latitude       float64   `validate:"required"`
-	Longitude      float64   `validate:"required"`
-	EndereableID   string    `gorm:"index"`
-	EndereableType string    `gorm:"index"`
+	Bairro         string    `validate:"required,max=50" gorm:"not null"`
+	Cidade         string    `validate:"required,max=50" gorm:"not null"`
+	Uf             string    `validate:"required,max=2" gorm:"not null"`
+	Cep            string    `validate:"required,max=9" gorm:"not null"`
+	Latitude       float64   `validate:"required" gorm:"not null"`
+	Longitude      float64   `validate:"required" gorm:"not null"`
+	EndereableID   string    `gorm:"index;not null"`
+	EndereableType string    `gorm:"index;not null"`
 	CreatedAt      time.Time `gorm:"autoCreateTime"`
 	UpdatedAt      time.Time `gorm:"autoUpdateTime"`
 }
@@ -28,7 +28,7 @@ type Endereco struct {
 type CreateEnderecoInput struct {
 	TipoLogradouro string
 	Logradouro     string
-	Numero         string
+	Numero         *string
 	Complemento    string
 	Bairro         string
 	Cidade         string
