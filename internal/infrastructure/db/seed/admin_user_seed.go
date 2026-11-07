@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"reserva_vagas/internal/usuario"
 	"strings"
 
@@ -21,7 +22,7 @@ func CriarAdminUser(db *gorm.DB) {
 	}
 
 	role := usuario.Admin
-	senhaText := gerarStringAleatoria(10)
+	senhaText := os.Getenv("ADMIN_PWD")
 	fmt.Printf("Utilize a senha %s para realizar login no sistema, após o primeiro login a senha precisará ser redefinida.", senhaText)
 	admin_user, err := usuario.NewUsuario(email, senhaText, role)
 	if err != nil {

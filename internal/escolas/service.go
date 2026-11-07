@@ -14,11 +14,12 @@ import (
 const raioTerraKm = 6371.0
 
 type Service struct {
-	repo Repository
+	repo  Repository
+	repoE escolaridades.Repository
 }
 
-func NewService(r Repository) *Service {
-	return &Service{repo: r}
+func NewService(r Repository, repoE escolaridades.Repository) *Service {
+	return &Service{repo: r, repoE: repoE}
 }
 
 func (s *Service) SalvarEscola(nome string, inep string, email string, sigla string, telefone string, inputEndereco enderecos.CreateEnderecoInput) error {
@@ -93,18 +94,25 @@ func (s Service) ImportarEscolas(escolas []importacao.Escola) error {
 
 func (s Service) GetEscolasByDtNascimento(dtNascimento string, latitude, longitude float64) ([]*Escola, error) {
 	layoutBR := "02-01-2006"
+	fmt.Println(latitude)
+	fmt.Println(longitude)
 	dt, err := time.Parse(layoutBR, dtNascimento)
 	if err != nil {
 		return nil, err
 	}
 
 	idade := calcularIdade(dt)
-	escolaridade, err := escolaridades.ObterEscolaridadePorIdade(idade)
+	infoEscolaridade, err := escolaridades.ObterEscolaridadePorIdade(idade)
 	if err != nil {
 		return nil, err
 	}
 
-	escolas, err := s.repo.GetByEscolaByCodigo(escolaridade.Codigo)
+	escolaridade, err := s.repoE.FindByCodigo(infoEscolaridade.Codigo)
+	if err != nil {
+		return nil, err
+	}
+
+	escolas, err := s.repo.GetByEscolaByEscolaridadeId(escolaridade.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +156,7 @@ func calcularDistancia(escolas []*Escola, latitude, longitude float64) []*Escola
 		fmt.Println(distancia)
 
 		escola.Distancia = distancia
-		if distancia < 2 {
+		if distancia < 5 {
 			escolasResult = append(escolasResult, escola)
 		}
 	}

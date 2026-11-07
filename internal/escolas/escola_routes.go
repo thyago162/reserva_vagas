@@ -10,7 +10,7 @@ import (
 )
 
 func RegisterRoutes(r chi.Router, repo Repository, repoEE EscolaridadeEscolaRepository, repoE escolaridades.Repository) {
-	service := NewService(repo)
+	service := NewService(repo, repoE)
 	eeService := NewEscolaridadeEscolaService(repoEE, repo, repoE)
 
 	handler := NewEscolaHandler(service)

@@ -49,10 +49,29 @@ type CriarReservaDTO struct {
 	Longitude               float64 `json:"longitude"`
 }
 
-func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) error {
-	return r.Db.Transaction(func(tx *gorm.DB) error {
+type ReservaResponse struct {
+	NomeCandidato           string
+	CpfCandidato            string
+	DtNascimentoCandidato   string
+	NomeResponsavel         string
+	CpfResponsavel          string
+	DtNascimentoResponsavel string
+	Telefone                string
+	EmailResponsavel        string
+	Logradouro              string
+	Numero                  string
+	Complemento             string
+	Bairro                  string
+	Cidade                  string
+	Uf                      string
+	Situacao                string
+}
 
-		//1. Salva os dados gerais do candidato/responsavel
+func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) (ReservaResponse, error) {
+	var reservaResponse ReservaResponse
+
+	err := r.Db.Transaction(func(tx *gorm.DB) error {
+		// 1. Salva os dados gerais do candidato/responsavel
 		candDto := candidato.CreateCandidatoDTO{
 			Nome:                    dto.NomeCandidato,
 			Cpf:                     dto.CpfCandidato,
@@ -64,13 +83,12 @@ func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) error {
 			EmailResponavel:         dto.EmailResponsavel,
 		}
 
-		candidato, err := salvarCandidato(candDto, r.CandRepo, tx)
-
+		candidatoObj, err := salvarCandidato(candDto, r.CandRepo, tx)
 		if err != nil {
-			return err
+			return err // Retorna apenas o erro
 		}
 
-		//2. Salva o endereço
+		// 2. Salva o endereço
 		endDto := enderecos.CreateEnderecoInput{
 			TipoLogradouro: dto.TipoLogradouro,
 			Logradouro:     dto.Logradouro,
@@ -82,24 +100,50 @@ func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) error {
 			Cep:            dto.Cep,
 			Latitude:       dto.Latitude,
 			Longitude:      dto.Longitude,
-			EndereableID:   candidato.Id,
+			EndereableID:   candidatoObj.Id,
 			EndereableType: "candidato",
 		}
 
 		err = salvarEndereco(endDto, r.EndRepo, tx)
 		if err != nil {
-			return err
+			return err // Retorna apenas o erro
 		}
 
-		err = salvarReserva(dto.EscolaId, dto.EscolaridadeId, dto.TurnoId, dto.VagaId, candidato.Id, r.ResRepo, tx)
+		reserva, err := salvarReserva(dto.EscolaId, dto.EscolaridadeId, dto.TurnoId, dto.VagaId, candidatoObj.Id, r.ResRepo, tx)
 		if err != nil {
+			// É uma boa prática usar errors.Is ou retornar o erro original (database rollback)
+			// em vez de mascarar, mas mantendo a sua mensagem customizada se preferir:
 			return errors.New("Falha ao salvar a reserva")
 		}
 
-		return nil
-	})
-}
+		// Corrigida a formatação de datas do Go ("02/01/2006")
+		reservaResponse = ReservaResponse{
+			NomeCandidato:           candidatoObj.Nome,
+			CpfCandidato:            candidatoObj.Cpf,
+			DtNascimentoCandidato:   candidatoObj.DtNascimento.Format("02/01/2006"),
+			NomeResponsavel:         candidatoObj.NomeResponsavel,
+			CpfResponsavel:          candidatoObj.CpfResponsavel,
+			DtNascimentoResponsavel: candidatoObj.DtNascimentoResponsavel.Format("02/01/2006"),
+			Telefone:                candidatoObj.Telefone,
+			EmailResponsavel:        candidatoObj.EmailResponavel,
+			Logradouro:              dto.Logradouro,
+			Numero:                  *dto.Numero,
+			Complemento:             dto.Complemento,
+			Bairro:                  dto.Bairro,
+			Cidade:                  dto.Cidade,
+			Uf:                      dto.Uf,
+			Situacao:                string(reserva.Situacao),
+		}
 
+		return nil // Transação bem sucedida
+	})
+
+	if err != nil {
+		return ReservaResponse{}, err
+	}
+
+	return reservaResponse, nil
+}
 func salvarCandidato(
 	candDto candidato.CreateCandidatoDTO,
 	candRepo candidato.Repository,
@@ -144,16 +188,16 @@ func salvarReserva(
 	vagaId string,
 	resRepo Repository,
 	tx *gorm.DB,
-) error {
+) (*Reserva, error) {
 	reserva, err := NewReserva(escolaId, EscolaridadeId, turnoId, candidatoId, vagaId)
 	if err != nil {
-		return errors.New("Falha na validação dos dados da reserva.")
+		return nil, errors.New("Falha na validação dos dados da reserva.")
 	}
 
 	err = resRepo.StoreWithTx(tx, reserva)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return reserva, nil
 }

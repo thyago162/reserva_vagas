@@ -40,3 +40,10 @@ func (e *EscolaridadeRepositoryDb) Index() ([]*escolaridades.Escolaridade, error
 
 	return escolaridades, nil
 }
+
+func (e *EscolaridadeRepositoryDb) FindByCodigo(codigo string) (*escolaridades.Escolaridade, error) {
+	var escolaridade escolaridades.Escolaridade
+	err := e.Db.Where("codigo = ?", codigo).First(&escolaridade).Error
+
+	return &escolaridade, err
+}

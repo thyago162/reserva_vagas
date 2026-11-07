@@ -1,9 +1,11 @@
 package reservas
 
 import (
+	"reserva_vagas/internal/auth"
 	"reserva_vagas/internal/candidato"
 	"reserva_vagas/internal/enderecos"
 	"reserva_vagas/internal/infrastructure/http"
+	"reserva_vagas/internal/usuario"
 
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"
@@ -14,5 +16,11 @@ func RegisterRoutes(r chi.Router, db *gorm.DB, candRepo candidato.Repository, en
 	service := NewRealizarReservaService(db, resRepo, candRepo, endRepo)
 	handler := NewRealizarReservaHandler(service)
 
-	r.Post("/realizar-reserva", http.HandlerErro(handler.RealizarReservaCandidato))
+	r.Route("/reserva-vagas", func(r chi.Router) {
+		r.Use(auth.AuthMiddleware)
+		r.Use(auth.RequireRole(usuario.Mcp))
+
+		r.Post("/realizar-reserva", http.HandlerErro(handler.RealizarReservaCandidato))
+	})
+
 }

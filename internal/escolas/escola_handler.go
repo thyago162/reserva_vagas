@@ -8,6 +8,7 @@ import (
 	"reserva_vagas/internal/importacao"
 	"reserva_vagas/internalerrors"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi"
 )
@@ -138,18 +139,19 @@ func (h *EscolaHandler) ImportarEmLotes(w http.ResponseWriter, r *http.Request) 
 }
 
 func (h *EscolaHandler) GetEscolasByDtNascimento(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	dtNascimento := r.URL.Query().Get("dt_nascimento")
+	dtNascimento := r.URL.Query().Get("data_nascimento")
+
 	if dtNascimento == "" {
 		return nil, http.StatusBadRequest, internalerrors.ErrValidation
 	}
 
 	// Converte e valida na mesma linha
-	lat, err := strconv.ParseFloat(r.URL.Query().Get("latitude"), 64)
+	lat, err := strconv.ParseFloat(strings.TrimSpace(r.URL.Query().Get("latitude")), 64)
 	if err != nil {
 		return nil, http.StatusBadRequest, fmt.Errorf("latitude inválida: %w", internalerrors.ErrValidation)
 	}
 
-	lon, err := strconv.ParseFloat(r.URL.Query().Get("longitude"), 64)
+	lon, err := strconv.ParseFloat(strings.TrimSpace(r.URL.Query().Get("longitude")), 64)
 	if err != nil {
 		return nil, http.StatusBadRequest, fmt.Errorf("longitude inválida: %w", internalerrors.ErrValidation)
 	}

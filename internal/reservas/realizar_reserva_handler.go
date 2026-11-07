@@ -19,7 +19,7 @@ func (h *RealizarReservaHandler) RealizarReservaCandidato(w http.ResponseWriter,
 		return nil, http.StatusBadRequest, err
 	}
 
-	err := h.service.RealizarReserva(req)
+	reservaResponse, err := h.service.RealizarReserva(req)
 	if err != nil {
 		return nil, http.StatusBadRequest, err
 	}
@@ -27,5 +27,5 @@ func (h *RealizarReservaHandler) RealizarReservaCandidato(w http.ResponseWriter,
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(http.StatusCreated)
 
-	return map[string]string{"message": "Reserva realizada com sucesso."}, http.StatusCreated, nil
+	return reservaResponse, http.StatusCreated, nil
 }

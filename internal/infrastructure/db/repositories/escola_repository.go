@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"fmt"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/importacao"
 
@@ -57,28 +56,20 @@ func (e *EscolaRepositoryDb) ImportarEmLotes(escolas []importacao.Escola) error 
 	return nil
 }
 
-func (e *EscolaRepositoryDb) GetByEscolaByCodigo(codigo string) ([]*escolas.Escola, error) {
+func (e *EscolaRepositoryDb) GetByEscolaByEscolaridadeId(escolaridadeId string) ([]*escolas.Escola, error) {
 	var escolasLista []*escolas.Escola
-	fmt.Println(codigo)
 
 	tx := e.Db.
 		Distinct("escolas.id").
-		// 1. Seleciona apenas o necessário da tabela principal
+		// 1. Seleciona apenas os campos necessários da tabela principal
 		Select("escolas.id", "escolas.nome", "escolas.inep", "escolas.email", "escolas.sigla", "escolas.telefone").
 
-		// 2. CORREÇÃO: Faz o Join na query principal para FILTRAR as escolas corretas no banco
+		// 2. Faz o Join com a tabela pivot e com escolaridades para filtrar apenas as escolas que possuem essa escolaridade
 		Joins("JOIN escolaridade_escolas ON escolaridade_escolas.escola_id = escolas.id").
-		Joins("JOIN escolaridades on escolaridade_escolas.escolaridade_id = escolaridade_id").
-		Where("escolaridades.codigo = ?", codigo).
+		Joins("JOIN escolaridades ON escolaridade_escolas.escolaridade_id = escolaridades.id").
+		Where("escolaridades.id = ?", escolaridadeId).
 
-		// 3. Mantém o Preload para trazer os dados estruturados de Escolaridade (sem o Where aqui dentro)
-		Preload("EscolaridadeEscola", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "escola_id", "escolaridade_id").
-				Preload("Escolaridade", func(db *gorm.DB) *gorm.DB {
-					return db.Select("id", "nome as nome_escolaridade")
-				})
-		}).
-		// Seu mapeamento de endereço está perfeito (incluiu os campos polimórficos corretamente!)
+		// 3. Preload do Endereço (trazendo apenas os campos especificados)
 		Preload("Endereco", func(db *gorm.DB) *gorm.DB {
 			return db.Select(
 				"id",
@@ -96,16 +87,14 @@ func (e *EscolaRepositoryDb) GetByEscolaByCodigo(codigo string) ([]*escolas.Esco
 				"longitude",
 			)
 		}).
-		// Perfeito: incluiu o id e a FK escola_id
+
+		// 4. Preload das Vagas Escolares (filtrando e trazendo os respectivos Turnos e Escolaridades)
 		Preload("VagasEscolares", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "escola_id", "vagas_disponiveis")
-		}).
-		// Perfeito: incluiu as chaves de ligação id, escola_id e turno_id
-		Preload("EscolaTurno", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id", "escola_id", "turno_id").
-				Preload("Turno", func(db *gorm.DB) *gorm.DB {
-					return db.Select("id", "nome as nome_turno")
-				})
+			return db.
+				Preload("Escolaridade").
+				Preload("Turno").
+				Where("escolaridade_id = ?", escolaridadeId).
+				Select("id", "escola_id", "vagas_disponiveis", "escolaridade_id", "turno_id")
 		}).
 		Find(&escolasLista)
 
