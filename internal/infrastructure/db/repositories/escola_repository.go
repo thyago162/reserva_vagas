@@ -60,40 +60,25 @@ func (e *EscolaRepositoryDb) GetByEscolaByEscolaridadeId(escolaridadeId string) 
 	var escolasLista []*escolas.Escola
 
 	tx := e.Db.
-		Distinct("escolas.id").
-		// 1. Seleciona apenas os campos necessários da tabela principal
+		Table("escolas").
 		Select("escolas.id", "escolas.nome", "escolas.inep", "escolas.email", "escolas.sigla", "escolas.telefone").
-
-		// 2. Faz o Join com a tabela pivot e com escolaridades para filtrar apenas as escolas que possuem essa escolaridade
-		Joins("JOIN escolaridade_escolas ON escolaridade_escolas.escola_id = escolas.id").
-		Joins("JOIN escolaridades ON escolaridade_escolas.escolaridade_id = escolaridades.id").
-		Where("escolaridades.id = ?", escolaridadeId).
-
-		// 3. Preload do Endereço (trazendo apenas os campos especificados)
+		Joins("INNER JOIN escolaridade_escolas ON escolaridade_escolas.escola_id = escolas.id").
+		Joins("INNER JOIN escolaridades ON escolaridade_escolas.escolaridade_id = escolaridades.id").
+		Joins("INNER JOIN vagas_escolares ON vagas_escolares.escola_id = escolas.id AND vagas_escolares.escolaridade_id = escolaridades.id").
+		Where("escolaridades.id = ? AND vagas_escolares.vagas_disponiveis > 0", escolaridadeId).
+		Distinct("escolas.id").
 		Preload("Endereco", func(db *gorm.DB) *gorm.DB {
 			return db.Select(
-				"id",
-				"tipo_logradouro",
-				"logradouro",
-				"numero",
-				"complemento",
-				"bairro",
-				"cidade",
-				"uf",
-				"cep",
-				"endereable_id",
-				"endereable_type",
-				"latitude",
-				"longitude",
+				"id", "tipo_logradouro", "logradouro", "numero", "complemento",
+				"bairro", "cidade", "uf", "cep", "endereable_id", "endereable_type",
+				"latitude", "longitude",
 			)
 		}).
-
-		// 4. Preload das Vagas Escolares (filtrando e trazendo os respectivos Turnos e Escolaridades)
 		Preload("VagasEscolares", func(db *gorm.DB) *gorm.DB {
 			return db.
 				Preload("Escolaridade").
 				Preload("Turno").
-				Where("escolaridade_id = ?", escolaridadeId).
+				Where("escolaridade_id = ? AND vagas_disponiveis > 0", escolaridadeId).
 				Select("id", "escola_id", "vagas_disponiveis", "escolaridade_id", "turno_id")
 		}).
 		Find(&escolasLista)
