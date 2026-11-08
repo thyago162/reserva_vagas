@@ -30,11 +30,6 @@ func EscolaridadeSeed(db *gorm.DB) {
 		{nome: "7º ano", siglaEtapa: "EF", codigo: "EF07"},
 		{nome: "8º ano", siglaEtapa: "EF", codigo: "EF08"},
 		{nome: "9º ano", siglaEtapa: "EF", codigo: "EF09"},
-
-		// Ensino Médio
-		{nome: "1º ano", siglaEtapa: "EM", codigo: "EM01"},
-		{nome: "2º ano", siglaEtapa: "EM", codigo: "EM02"},
-		{nome: "3º ano", siglaEtapa: "EM", codigo: "EM03"},
 	}
 
 	for _, d := range dados {

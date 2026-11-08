@@ -12,7 +12,6 @@ func TurnoSeed(db *gorm.DB) {
 		{nome: "Integral", codigo: "IN"},
 		{nome: "Manhã", codigo: "MN"},
 		{nome: "Tarde", codigo: "TD"},
-		{nome: "Noite", codigo: "NT"},
 	}
 
 	for _, d := range dados {
