@@ -156,7 +156,7 @@ func calcularDistancia(escolas []*Escola, latitude, longitude float64) []*Escola
 		fmt.Println(distancia)
 
 		escola.Distancia = distancia
-		if distancia < 5 {
+		if distancia < 15 {
 			escolasResult = append(escolasResult, escola)
 		}
 	}
