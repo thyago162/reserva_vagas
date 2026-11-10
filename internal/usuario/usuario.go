@@ -1,6 +1,7 @@
 package usuario
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -26,6 +27,7 @@ type Usuario struct {
 }
 
 func NewUsuario(email, senha string, role TipoRole) (*Usuario, error) {
+	fmt.Printf("SENHA GERADA: [%s]\n", senha)
 	bytesHash, err := bcrypt.GenerateFromPassword([]byte(senha), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err

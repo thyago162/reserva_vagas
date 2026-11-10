@@ -7,6 +7,7 @@ import (
 	"reserva_vagas/internal/importacao"
 	"reserva_vagas/internal/infrastructure/db"
 	"reserva_vagas/internal/infrastructure/db/seed"
+	"reserva_vagas/internal/infrastructure/messasing"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
@@ -20,10 +21,23 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+
+	//Inicializa o banco de dados
 	database, err := db.NewDB()
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//Inicializa o RabbitMQ
+	rabbitConn, err := messasing.NewRabbitMQ()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer rabbitConn.Conn.Close()
+	defer rabbitConn.Channel.Close()
+
+	publisher := messasing.NewRabbitPublisher(rabbitConn.Channel)
 
 	//Seed
 	seed.Seed(database)
@@ -31,7 +45,7 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
-	endpoints.InitRoutes(r, database)
+	endpoints.InitRoutes(r, database, publisher)
 	importacao.SetDatabase(database)
 
 	if err := http.ListenAndServe(":3000", r); err != nil {

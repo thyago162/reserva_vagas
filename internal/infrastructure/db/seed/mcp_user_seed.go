@@ -1,7 +1,6 @@
 package seed
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"reserva_vagas/internal/usuario"
@@ -21,7 +20,6 @@ func CriarMCPUser(db *gorm.DB) {
 
 	role := usuario.Mcp
 	senhaText := os.Getenv("MCP_PWD")
-	fmt.Printf("Utilize a senha %s para realizar login no sistema, após o primeiro login a senha precisará ser redefinida.", senhaText)
 	mcp_user, err := usuario.NewUsuario(email, senhaText, role)
 	if err != nil {
 		log.Fatal("Erro na validação de dados do usuário")

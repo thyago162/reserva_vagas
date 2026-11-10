@@ -2,8 +2,12 @@ package reservas
 
 import (
 	"errors"
+	"math/rand"
 	"reserva_vagas/internal/candidato"
 	"reserva_vagas/internal/enderecos"
+	"reserva_vagas/internal/infrastructure/messasing"
+	"reserva_vagas/internal/usuario"
+	"strings"
 
 	"gorm.io/gorm"
 )
@@ -13,14 +17,25 @@ type RealizarReservaService struct {
 	ResRepo  Repository
 	CandRepo candidato.Repository
 	EndRepo  enderecos.Repository
+	UserRepo usuario.Repository
+	RabitMq  *messasing.RabbitPublisher
 }
 
-func NewRealizarReservaService(db *gorm.DB, resRepo Repository, candRepo candidato.Repository, endRepo enderecos.Repository) *RealizarReservaService {
+func NewRealizarReservaService(
+	db *gorm.DB,
+	resRepo Repository,
+	candRepo candidato.Repository,
+	endRepo enderecos.Repository,
+	userRepo usuario.Repository,
+	rabitMq *messasing.RabbitPublisher,
+) *RealizarReservaService {
 	return &RealizarReservaService{
 		Db:       db,
 		ResRepo:  resRepo,
 		CandRepo: candRepo,
 		EndRepo:  endRepo,
+		UserRepo: userRepo,
+		RabitMq:  rabitMq,
 	}
 }
 
@@ -111,10 +126,14 @@ func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) (ReservaRe
 
 		reserva, err := salvarReserva(dto.EscolaId, dto.EscolaridadeId, dto.TurnoId, dto.VagaId, candidatoObj.Id, r.ResRepo, tx)
 		if err != nil {
-			// É uma boa prática usar errors.Is ou retornar o erro original (database rollback)
-			// em vez de mascarar, mas mantendo a sua mensagem customizada se preferir:
 			return errors.New("Falha ao salvar a reserva")
 		}
+
+		senhaAleatoria := gerarStringAleatoria(10)
+		cadastraResponsavel(candidatoObj.EmailResponavel, senhaAleatoria, r.UserRepo)
+
+		//Joga na fila do rabitmq
+		r.RabitMq.PublicarEmailReservaAsync(candidatoObj.EmailResponavel, candidatoObj.NomeResponsavel, senhaAleatoria)
 
 		// Corrigida a formatação de datas do Go ("02/01/2006")
 		reservaResponse = ReservaResponse{
@@ -200,4 +219,28 @@ func salvarReserva(
 	}
 
 	return reserva, nil
+}
+
+func cadastraResponsavel(emailResp, senhaAleatoria string, userRepo usuario.Repository) error {
+	usuario, err := usuario.NewUsuario(emailResp, senhaAleatoria, usuario.User)
+	if err != nil {
+		return errors.New("Falha na validação dos dados do usuário")
+	}
+
+	err = userRepo.Store(usuario)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func gerarStringAleatoria(n int) string {
+	const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	var sb strings.Builder
+	for i := 0; i < n; i++ {
+		idx := rand.Intn(len(letras))
+		sb.WriteByte(letras[idx])
+	}
+	return sb.String()
 }

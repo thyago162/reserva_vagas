@@ -5,6 +5,7 @@ import (
 	"reserva_vagas/internal/escolaridades"
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/infrastructure/db/repositories"
+	"reserva_vagas/internal/infrastructure/messasing"
 	"reserva_vagas/internal/login"
 	"reserva_vagas/internal/reservas"
 	"reserva_vagas/internal/vagasescolares"
@@ -13,41 +14,44 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitRoutes(r chi.Router, database *gorm.DB) {
-	// ==========================================
-	// Módulo: Escolas
-	// ==========================================
+func InitRoutes(r chi.Router, database *gorm.DB, rabbitConn *messasing.RabbitPublisher) {
+	// ===================================================
+	// INICIALIZAÇÃO DE REPOSITORIOS
+	// =======================================================
 	repoEscola := repositories.NewEscolaRepositoryDb(database)
 	repoEE := repositories.NewEscolaridadeEscolaRepositoryDb(database)
 	repoE := repositories.NewEscolaridadeRepositoryDb(database)
+	repoEscolaridade := repositories.NewEscolaridadeRepositoryDb(database)
+	repo := repositories.NewVagasEscolaresRepository(database)
+	candRepo := repositories.NewCandidatoRepository(database)
+	endRepo := repositories.NewEnderecoRepositorydb(database)
+	resRepo := repositories.NewReservaRepository(database)
+	userRepo := repositories.NewUsuarioRepository(database)
 
+	// ==========================================
+	// Módulo: Escolas
+	// ==========================================
 	escolas.RegisterRoutes(r, repoEscola, repoEE, repoE)
 
 	// ==========================================
 	// Módulo: Escolaridades
 	// ==========================================
-	repoEscolaridade := repositories.NewEscolaridadeRepositoryDb(database)
 	escolaridades.RegisterRoutes(r, repoEscolaridade)
 
 	// ========================================================
 	// Módul: Vagas Escolares
 	// =========================================================
-	repo := repositories.NewVagasEscolaresRepository(database)
 	vagasescolares.RegisterRoutes(r, repo)
 
 	// ====================================================================
 	// Módulo: Reservas Escolares
 	//===========================================================================
-	candRepo := repositories.NewCandidatoRepository(database)
-	endRepo := repositories.NewEnderecoRepositorydb(database)
-	resRepo := repositories.NewReservaRepository(database)
-
-	reservas.RegisterRoutes(r, database, candRepo, endRepo, resRepo)
+	reservas.RegisterRoutes(r, database, candRepo, endRepo, resRepo, userRepo, rabbitConn)
 
 	// ========================================================================
 	// Módulo: Login
 	// ========================================================================
-	userRepo := repositories.NewUsuarioRepository(database)
+
 	login.RegisterRoutes(r, userRepo)
 
 	// ========================================================================
