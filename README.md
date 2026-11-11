@@ -3,7 +3,7 @@
     O Reserva de Vagas é um sistema de alta performance, modular e distribuído, desenvolvido sob medida para cenários de alta concorrência.
     A solução adota o Model Context Protocol (MCP) para permitir a integração nativa com assistentes inteligentes e sistemas de IA, mantendo o isolamento total da regra de negócio central.
 
-# [Arquitetura do sistema](docs/arquitetura.png)
+# ![Arquitetura do sistema](docs/arquitetura.png)
 
 # reserva_vagas (Backend Core)
 
