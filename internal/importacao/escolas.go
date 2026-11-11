@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"reserva_vagas/internalerrors"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -210,12 +211,21 @@ func NewVagaEscolar(escolaId, escolaridadeId, turnoId string, vagasTotais, anoLe
 }
 
 func ImportarListaEscolasConcorrente(listaEscolas []ImportacaoEscolaDTO, numWorkers int) []ResultadoImportacao {
+	if numWorkers < 1 {
+		numWorkers = 1
+	}
+
+	var wg sync.WaitGroup
 	jobs := make(chan ImportacaoEscolaDTO, len(listaEscolas))
 	results := make(chan ResultadoImportacao, len(listaEscolas))
 
-	for w := 1; w <= numWorkers; w++ {
-		go workerImportacao(db, jobs, results)
+	for w := 0; w < numWorkers; w++ {
+		wg.Go(func() {
+			workerImportacao(db, jobs, results)
+		})
 	}
+
+	go func() { wg.Wait(); close(results) }()
 
 	for _, escolaDTO := range listaEscolas {
 		jobs <- escolaDTO
@@ -224,8 +234,8 @@ func ImportarListaEscolasConcorrente(listaEscolas []ImportacaoEscolaDTO, numWork
 	close(jobs)
 
 	var relatorio []ResultadoImportacao
-	for i := 0; i < len(listaEscolas); i++ {
-		relatorio = append(relatorio, <-results)
+	for r := range results {
+		relatorio = append(relatorio, r)
 	}
 
 	return relatorio
@@ -233,9 +243,13 @@ func ImportarListaEscolasConcorrente(listaEscolas []ImportacaoEscolaDTO, numWork
 
 func workerImportacao(db *gorm.DB, jobs <-chan ImportacaoEscolaDTO, results chan<- ResultadoImportacao) {
 	for dados := range jobs {
-		err := db.Transaction(func(tx *gorm.DB) error {
-			return processarEscola(tx, dados)
-		})
+		err := importarSeguro(db, dados)
+		results <- ResultadoImportacao{
+			Inep:    dados.Inep,
+			Nome:    dados.Nome,
+			Sucesso: err == nil,
+			Erro:    err,
+		}
 
 		// Retorna o resultado individual no canal
 		if err != nil {
@@ -244,6 +258,18 @@ func workerImportacao(db *gorm.DB, jobs <-chan ImportacaoEscolaDTO, results chan
 			results <- ResultadoImportacao{Inep: dados.Inep, Nome: dados.Nome, Sucesso: true, Erro: nil}
 		}
 	}
+}
+
+func importarSeguro(db *gorm.DB, dados ImportacaoEscolaDTO) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("pânico ao importar INEP %s: %v", dados.Inep, r)
+		}
+	}()
+
+	return db.Transaction(func(tx *gorm.DB) error {
+		return processarEscola(tx, dados)
+	})
 }
 
 func processarEscola(tx *gorm.DB, dados ImportacaoEscolaDTO) error {
@@ -278,7 +304,9 @@ func processarEscola(tx *gorm.DB, dados ImportacaoEscolaDTO) error {
 	}
 
 	//Salva as vagas
-	salvarVagasEscolares(tx, escola.Id, escolaridadeMap, turnoMap, dados.Vagas)
+	if err := salvarVagasEscolares(tx, escola.Id, escolaridadeMap, turnoMap, dados.Vagas); err != nil {
+		return err
+	}
 
 	return nil
 }

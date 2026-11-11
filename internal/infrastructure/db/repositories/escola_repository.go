@@ -34,18 +34,35 @@ func (e *EscolaRepositoryDb) Index() ([]*escolas.Escola, error) {
 func (e *EscolaRepositoryDb) Show(id string) (*escolas.Escola, error) {
 	var escola escolas.Escola
 	err := e.Db.Preload("Endereco").Where("id = ?", id).First(&escola).Error
+	if err != nil {
+		return nil, err
+	}
 
 	return &escola, err
 }
 
 func (e *EscolaRepositoryDb) Update(escola *escolas.Escola) error {
-	tx := e.Db.Save(escola)
-	return tx.Error
+	res := e.Db.Model(&escolas.Escola{}).Where("id = ?", escola.Id).Updates(escola)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (e *EscolaRepositoryDb) Destroy(id string) error {
-	tx := e.Db.Delete(&escolas.Escola{}, "id = ?", id)
-	return tx.Error
+	res := e.Db.Delete(&escolas.Escola{}, "id = ?", id)
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 func (e *EscolaRepositoryDb) ImportarEmLotes(escolas []importacao.Escola) error {
@@ -63,10 +80,9 @@ func (e *EscolaRepositoryDb) GetByEscolaByEscolaridadeId(escolaridadeId string) 
 		Table("escolas").
 		Select("escolas.id", "escolas.nome", "escolas.inep", "escolas.email", "escolas.sigla", "escolas.telefone").
 		Joins("INNER JOIN escolaridade_escolas ON escolaridade_escolas.escola_id = escolas.id").
-		Joins("INNER JOIN escolaridades ON escolaridade_escolas.escolaridade_id = escolaridades.id").
-		Joins("INNER JOIN vagas_escolares ON vagas_escolares.escola_id = escolas.id AND vagas_escolares.escolaridade_id = escolaridades.id").
-		Where("escolaridades.id = ? AND vagas_escolares.vagas_disponiveis > 0", escolaridadeId).
-		Distinct("escolas.id").
+		Joins("INNER JOIN vagas_escolares ON vagas_escolares.escola_id = escolas.id AND vagas_escolares.escolaridade_id = escolaridade_escolas.escolaridade_id").
+		Where("escolaridade_escolas.escolaridade_id = ? AND vagas_escolares.vagas_disponiveis > 0", escolaridadeId).
+		Distinct().
 		Preload("Endereco", func(db *gorm.DB) *gorm.DB {
 			return db.Select(
 				"id", "tipo_logradouro", "logradouro", "numero", "complemento",
