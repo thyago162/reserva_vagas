@@ -1,29 +1,54 @@
-# Reserva de Vagas - Arquitetura & Ecossistema
+# reserva_vagas
 
-    O Reserva de Vagas é um sistema de alta performance, modular e distribuído, desenvolvido sob medida para cenários de alta concorrência.
-    A solução adota o Model Context Protocol (MCP) para permitir a integração nativa com assistentes inteligentes e sistemas de IA, mantendo o isolamento total da regra de negócio central.
+Sistema inteligente de reserva de vagas escolares. O cidadão conversa com um agente de IA, que localiza as escolas municipais mais próximas pela distância e ajuda a concluir a matrícula. Projeto pessoal.
 
-# ![Arquitetura do sistema](docs/arquitetura.png)
+[![Arquitetura do sistema](docs/arquitetura.png)](docs/arquitetura.png)
 
-# reserva_vagas (Backend Core)
+## Componentes
 
-    Linguagem / Framework: Go (Golang)
+| Repositório | Função | Tecnologias |
+|---|---|---|
+| [reserva_vagas](https://github.com/thyago162/reserva_vagas) (este) | API de vagas e reservas e worker de e-mails | Go, GORM, RabbitMQ |
+| [reserva_vagas_front](https://github.com/thyago162/reserva_vagas_front) | Interface de conversa | Vue.js 3 |
+| [reserva_vagas_mcp_client](https://github.com/thyago162/reserva_vagas_mcp_client) | Orquestrador entre o front e o LLM | Python, FastAPI |
+| [reserva_vagas_mcp_server](https://github.com/thyago162/reserva_vagas_mcp_server) | Ferramentas MCP e sessões | Python, Redis |
 
-    Tecnologias Integradas: Mysql, Redis, RabbitMQ
+## Destaques técnicos
 
-    Descrição: É a peça fundamental do ecossistema. Contém todas as regras de negócio, governança de dados, validações de elegibilidade e segurança.
+- **Envio assíncrono de e-mails:** ao confirmar a reserva, a API usa goroutines e channels para publicar as mensagens numa fila do RabbitMQ, e um worker dedicado (mesmo repositório, `main` próprio) faz o envio. Assim a resposta é rápida mesmo com milhares de responsáveis a notificar.
+- **Agente de IA com MCP:** o LLM decide quais ferramentas usar (localização, listagem de escolas, verificação e registro de reserva).
+- **Busca por proximidade:** as escolas são ordenadas pela distância ao endereço do cidadão.
 
-# Principais Responsabilidades:
+## Estrutura
 
-    Concorrência Segura: Gerenciamento de disputas por vagas em tempo real utilizando locks distribuídos no Redis (evitando overselling).
-    Persistência de Dados: Modelagem e transações com integridade no PostgreSQL.
-    Processamento Assíncrono: Emissão de eventos de auditoria e envio de comprovantes/notificações via RabbitMQ.
+```
+<cmd/api/main.go>      API
+<cmd/worker/main.go>   worker de e-mails
+<internal/...>         <descreva as pastas principais>
+```
 
-# Pré-requisitos & Execução Local
+## Como rodar
 
-## Dependências Exigidas: 
-    Go: 1.22
-    RabbitMQ
-    Mysql8
+```bash
+git clone https://github.com/thyago162/reserva_vagas
+cd reserva_vagas
+cp .env.example .env   # preencha as variáveis
+go run <cmd/api>       # API
+go run <cmd/worker>    # worker de e-mails (em outro terminal)
+```
 
+## Variáveis de ambiente
 
+| Variável | Descrição |
+|---|---|
+| `<DB_...>` | Conexão com o banco de dados |
+| `<RABBITMQ_URL>` | Conexão com o RabbitMQ |
+| `<SMTP_...>` | Envio de e-mails |
+
+## Demonstração
+
+[Vídeo no YouTube](https://www.youtube.com/watch?v=uNiyldIHgVc)
+
+## Status
+
+Projeto em desenvolvimento.
