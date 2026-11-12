@@ -1,2 +1,3 @@
 gorm.db
 .env
+.env.test

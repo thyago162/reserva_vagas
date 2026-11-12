@@ -7,44 +7,9 @@ import (
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/importacao"
 
-	"github.com/glebarez/sqlite"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
-
-// ---------- Auxiliares ----------
-
-// novoDBTeste cria um banco em memória limpo para cada teste.
-func novoDBTeste(t *testing.T) *gorm.DB {
-	t.Helper()
-
-	db, err := gorm.Open(sqlite.Open("file::memory:"), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Silent), // use .Debug() no teste para ver o SQL
-	})
-	if err != nil {
-		t.Fatalf("abrir banco: %v", err)
-	}
-
-	sqlDB, _ := db.DB()
-	sqlDB.SetMaxOpenConns(1) // em memória, cada conexão seria um banco diferente
-	t.Cleanup(func() { sqlDB.Close() })
-
-	err = db.AutoMigrate(
-		&importacao.Escola{},
-		&importacao.Endereco{},
-		&importacao.Escolaridade{},
-		&importacao.Turno{},
-		&importacao.EscolaridadeEscola{},
-		&importacao.EscolaTurno{},
-		&importacao.VagasEscolares{},
-	)
-	if err != nil {
-		t.Fatalf("migrar tabelas: %v", err)
-	}
-
-	return db
-}
 
 // criarEscolaComVagas insere uma escola com vagas para uma escolaridade e devolve o id.
 func criarEscolaComVagas(t *testing.T, db *gorm.DB, inep, escolaridadeID, turnoID string, disponiveis int32) string {
@@ -121,12 +86,13 @@ func TestEscolaRepository_Update_NaoCriaEscolaInexistente(t *testing.T) {
 	db := novoDBTeste(t)
 	repo := NewEscolaRepositoryDb(db)
 
-	err := repo.Update(&escolas.Escola{Id: uuid.NewString(), Nome: "Fantasma"})
+	id := uuid.NewString()
+	err := repo.Update(&escolas.Escola{Id: id, Nome: "Fantasma"})
 
 	var total int64
-	db.Model(&importacao.Escola{}).Count(&total)
+	db.Model(&importacao.Escola{}).Where("id = ?", id).Count(&total)
 	if total != 0 {
-		t.Errorf("Update criou %d escola(s); não deveria criar nada", total)
+		t.Errorf("Update criou a escola %s; não deveria criar nada", id)
 	}
 	if err == nil {
 		t.Error("esperado erro ao atualizar escola inexistente")
