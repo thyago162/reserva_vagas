@@ -9,10 +9,10 @@ import (
 
 type Candidato struct {
 	Id                      string    `gorm:"primaryKey;size:36;column:id"`
-	Nome                    string    `validate:"min=15,max=250,required" gorm:"not null"`
+	Nome                    string    `validate:"min=7,max=250,required" gorm:"not null"`
 	Cpf                     string    `validate:"min=11,max=11,required" gorm:"not null"`
 	DtNascimento            time.Time `validate:"required" gorm:"not null"`
-	NomeResponsavel         string    `validate:"min=15,max=250,required" gorm:"not null"`
+	NomeResponsavel         string    `validate:"min=7,max=250,required" gorm:"not null"`
 	CpfResponsavel          string    `validate:"min=11,max=11,required" gorm:"not null"`
 	Telefone                string    `validate:"max=15"`
 	DtNascimentoResponsavel time.Time `validate:"required" gorm:"not null"`

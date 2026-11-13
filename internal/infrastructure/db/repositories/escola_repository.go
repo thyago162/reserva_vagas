@@ -33,7 +33,7 @@ func (e *EscolaRepositoryDb) Index() ([]*escolas.Escola, error) {
 
 func (e *EscolaRepositoryDb) Show(id string) (*escolas.Escola, error) {
 	var escola escolas.Escola
-	err := e.Db.Preload("Endereco").Where("id = ?", id).First(&escola).Error
+	err := e.Db.Preload("Endereco").Preload("EscolaridadeEscola").Preload("EscolaTurno").Preload("VagasEscolares").Where("id = ?", id).First(&escola).Error
 	if err != nil {
 		return nil, err
 	}

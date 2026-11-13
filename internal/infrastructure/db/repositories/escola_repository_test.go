@@ -28,8 +28,13 @@ func criarEscolaComVagas(t *testing.T, db *gorm.DB, inep, escolaridadeID, turnoI
 		t.Fatalf("criar escola: %v", err)
 	}
 
-	pivo := importacao.EscolaridadeEscola{Id: uuid.NewString(), EscolaId: escolaID, EscolaridadeId: escolaridadeID}
-	if err := db.Create(&pivo).Error; err != nil {
+	pivoE := importacao.EscolaridadeEscola{Id: uuid.NewString(), EscolaId: escolaID, EscolaridadeId: escolaridadeID}
+	if err := db.Create(&pivoE).Error; err != nil {
+		t.Fatalf("criar pivô: %v", err)
+	}
+
+	pivoT := importacao.EscolaTurno{Id: uuid.NewString(), EscolaId: escolaID, TurnoId: turnoID}
+	if err := db.Create(&pivoT).Error; err != nil {
 		t.Fatalf("criar pivô: %v", err)
 	}
 

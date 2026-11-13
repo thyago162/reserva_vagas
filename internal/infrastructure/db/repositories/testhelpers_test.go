@@ -2,7 +2,9 @@ package repositories
 
 import (
 	"os"
+	"reserva_vagas/internal/candidato"
 	"reserva_vagas/internal/importacao"
+	"reserva_vagas/internal/reservas"
 	"testing"
 
 	"github.com/glebarez/sqlite"
@@ -43,6 +45,8 @@ func abrirSQLite(t *testing.T) *gorm.DB {
 		&importacao.EscolaridadeEscola{},
 		&importacao.EscolaTurno{},
 		&importacao.VagasEscolares{},
+		&candidato.Candidato{},
+		&reservas.Reserva{},
 	)
 	if err != nil {
 		t.Fatalf("migrar tabelas: %v", err)
@@ -65,6 +69,8 @@ func abrirMySQL(t *testing.T, dsn string) *gorm.DB {
 		&importacao.EscolaridadeEscola{},
 		&importacao.EscolaTurno{},
 		&importacao.VagasEscolares{},
+		&candidato.Candidato{},
+		&reservas.Reserva{},
 	)
 
 	return db
