@@ -27,6 +27,7 @@ func InitRoutes(r chi.Router, database *gorm.DB, rabbitConn *messasing.RabbitPub
 	endRepo := repositories.NewEnderecoRepositorydb(database)
 	resRepo := repositories.NewReservaRepository(database)
 	userRepo := repositories.NewUsuarioRepository(database)
+	vagaRepo := repositories.NewVagasEscolaresRepository(database)
 
 	// ==========================================
 	// Módulo: Escolas
@@ -46,7 +47,7 @@ func InitRoutes(r chi.Router, database *gorm.DB, rabbitConn *messasing.RabbitPub
 	// ====================================================================
 	// Módulo: Reservas Escolares
 	//===========================================================================
-	reservas.RegisterRoutes(r, database, candRepo, endRepo, resRepo, userRepo, rabbitConn)
+	reservas.RegisterRoutes(r, database, candRepo, endRepo, resRepo, userRepo, rabbitConn, vagaRepo)
 
 	// ========================================================================
 	// Módulo: Login

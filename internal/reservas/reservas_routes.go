@@ -7,6 +7,7 @@ import (
 	"reserva_vagas/internal/infrastructure/http"
 	"reserva_vagas/internal/infrastructure/messasing"
 	"reserva_vagas/internal/usuario"
+	"reserva_vagas/internal/vagasescolares"
 
 	"github.com/go-chi/chi"
 	"gorm.io/gorm"
@@ -20,6 +21,7 @@ func RegisterRoutes(
 	resRepo Repository,
 	userRepo usuario.Repository,
 	rabbitMq *messasing.RabbitPublisher,
+	vagaRepo vagasescolares.Repository,
 ) {
 
 	service := NewRealizarReservaService(
@@ -29,6 +31,7 @@ func RegisterRoutes(
 		endRepo,
 		userRepo,
 		rabbitMq,
+		vagaRepo,
 	)
 	handler := NewRealizarReservaHandler(service)
 

@@ -6,53 +6,14 @@ import (
 
 	"reserva_vagas/internal/escolas"
 	"reserva_vagas/internal/importacao"
+	"reserva_vagas/internal/testutil"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
-// criarEscolaComVagas insere uma escola com vagas para uma escolaridade e devolve o id.
-func criarEscolaComVagas(t *testing.T, db *gorm.DB, inep, escolaridadeID, turnoID string, disponiveis int32) string {
-	t.Helper()
-
-	escolaID := uuid.NewString()
-	escola := importacao.Escola{
-		Id: escolaID, Nome: "Escola " + inep, Inep: inep,
-		Email: inep + "@escola.test", Sigla: "E" + inep, Telefone: "83999990000",
-		Endereco: importacao.Endereco{
-			Id: uuid.NewString(), EndereableID: escolaID, EndereableType: "escola",
-			Cidade: "João Pessoa", Uf: "PB", Latitude: -7.11, Longitude: -34.86,
-		},
-	}
-	if err := db.Create(&escola).Error; err != nil {
-		t.Fatalf("criar escola: %v", err)
-	}
-
-	pivoE := importacao.EscolaridadeEscola{Id: uuid.NewString(), EscolaId: escolaID, EscolaridadeId: escolaridadeID}
-	if err := db.Create(&pivoE).Error; err != nil {
-		t.Fatalf("criar pivô: %v", err)
-	}
-
-	pivoT := importacao.EscolaTurno{Id: uuid.NewString(), EscolaId: escolaID, TurnoId: turnoID}
-	if err := db.Create(&pivoT).Error; err != nil {
-		t.Fatalf("criar pivô: %v", err)
-	}
-
-	vaga := importacao.VagasEscolares{
-		Id: uuid.NewString(), EscolaId: escolaID, EscolaridadeId: escolaridadeID, TurnoId: turnoID,
-		VagasTotais: 10, VagasDisponiveis: disponiveis, AnoLetivo: 2026,
-	}
-	if err := db.Create(&vaga).Error; err != nil {
-		t.Fatalf("criar vaga: %v", err)
-	}
-
-	return escolaID
-}
-
-// ---------- Testes ----------
-
 func TestEscolaRepository_StoreEShow(t *testing.T) {
-	db := novoDBTeste(t)
+	db := testutil.NovoDBTeste(t)
 	repo := NewEscolaRepositoryDb(db)
 
 	escola := &escolas.Escola{
@@ -74,7 +35,7 @@ func TestEscolaRepository_StoreEShow(t *testing.T) {
 
 // Deve FALHAR hoje: Show devolve &escola (não nil) mesmo com erro.
 func TestEscolaRepository_Show_NaoEncontrada(t *testing.T) {
-	repo := NewEscolaRepositoryDb(novoDBTeste(t))
+	repo := NewEscolaRepositoryDb(testutil.NovoDBTeste(t))
 
 	got, err := repo.Show(uuid.NewString())
 
@@ -88,7 +49,7 @@ func TestEscolaRepository_Show_NaoEncontrada(t *testing.T) {
 
 // Deve FALHAR hoje: Save faz upsert e cria a escola que não existia.
 func TestEscolaRepository_Update_NaoCriaEscolaInexistente(t *testing.T) {
-	db := novoDBTeste(t)
+	db := testutil.NovoDBTeste(t)
 	repo := NewEscolaRepositoryDb(db)
 
 	id := uuid.NewString()
@@ -106,7 +67,7 @@ func TestEscolaRepository_Update_NaoCriaEscolaInexistente(t *testing.T) {
 
 // Deve FALHAR hoje se o Distinct sobrescrever o Select (campos como Nome vêm vazios).
 func TestEscolaRepository_GetByEscolaByEscolaridadeId(t *testing.T) {
-	db := novoDBTeste(t)
+	db := testutil.NovoDBTeste(t)
 	repo := NewEscolaRepositoryDb(db)
 
 	e1 := importacao.Escolaridade{Id: uuid.NewString(), Codigo: "FUND1"}
@@ -118,9 +79,9 @@ func TestEscolaRepository_GetByEscolaByEscolaridadeId(t *testing.T) {
 		}
 	}
 
-	comVaga := criarEscolaComVagas(t, db, "111111", e1.Id, turno.Id, 5)
-	criarEscolaComVagas(t, db, "222222", e1.Id, turno.Id, 0) // sem vagas disponíveis
-	criarEscolaComVagas(t, db, "333333", e2.Id, turno.Id, 5) // outra escolaridade
+	comVaga := testutil.CriarEscolaComVagas(t, db, "111111", e1.Id, turno.Id, 5)
+	testutil.CriarEscolaComVagas(t, db, "222222", e1.Id, turno.Id, 0) // sem vagas disponíveis
+	testutil.CriarEscolaComVagas(t, db, "333333", e2.Id, turno.Id, 5) // outra escolaridade
 
 	got, err := repo.GetByEscolaByEscolaridadeId(e1.Id)
 	if err != nil {

@@ -3,13 +3,16 @@ package repositories
 import (
 	"reserva_vagas/internal/importacao"
 	"reserva_vagas/internal/reservas"
+	"reserva_vagas/internal/testutil"
 	"testing"
 
 	"github.com/google/uuid"
 )
 
+const n = 5
+
 func TestReservaRepository_CriarReserva(t *testing.T) {
-	db := novoDBTeste(t)
+	db := testutil.NovoDBTeste(t)
 	repo := NewReservaRepository(db)
 	repoEscola := NewEscolaRepositoryDb(db)
 
@@ -22,7 +25,7 @@ func TestReservaRepository_CriarReserva(t *testing.T) {
 		}
 	}
 
-	escolaId := criarEscolaComVagas(t, db, "111111", e1.Id, turno.Id, 5)
+	escolaId := testutil.CriarEscolaComVagas(t, db, "111111", e1.Id, turno.Id, 5)
 	escola, err := repoEscola.Show(escolaId)
 	if err != nil {
 		t.Fatalf("buscar escola: %v", err)
