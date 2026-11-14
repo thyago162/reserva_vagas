@@ -5,6 +5,5 @@ type Repository interface {
 	Store(vagasEscolares []*VagasEscolares) error
 	Show(id string) (*VagasEscolares, error)
 	Update(vagaEscolar *VagasEscolares) error
+	DebitarVaga(tx any, id string) error
 }
-
-//07192784494

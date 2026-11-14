@@ -5,12 +5,16 @@ import (
 	"math/rand"
 	"reserva_vagas/internal/candidato"
 	"reserva_vagas/internal/enderecos"
-	"reserva_vagas/internal/infrastructure/messasing"
 	"reserva_vagas/internal/usuario"
+	"reserva_vagas/internal/vagasescolares"
 	"strings"
 
 	"gorm.io/gorm"
 )
+
+type Publisher interface {
+	PublicarEmailReservaAsync(email string, nome string, senha string)
+}
 
 type RealizarReservaService struct {
 	Db       *gorm.DB
@@ -18,7 +22,8 @@ type RealizarReservaService struct {
 	CandRepo candidato.Repository
 	EndRepo  enderecos.Repository
 	UserRepo usuario.Repository
-	RabitMq  *messasing.RabbitPublisher
+	RabitMq  Publisher
+	vagaRepo vagasescolares.Repository
 }
 
 func NewRealizarReservaService(
@@ -27,7 +32,8 @@ func NewRealizarReservaService(
 	candRepo candidato.Repository,
 	endRepo enderecos.Repository,
 	userRepo usuario.Repository,
-	rabitMq *messasing.RabbitPublisher,
+	rabitMq Publisher,
+	vagaRepo vagasescolares.Repository,
 ) *RealizarReservaService {
 	return &RealizarReservaService{
 		Db:       db,
@@ -36,6 +42,7 @@ func NewRealizarReservaService(
 		EndRepo:  endRepo,
 		UserRepo: userRepo,
 		RabitMq:  rabitMq,
+		vagaRepo: vagaRepo,
 	}
 }
 
@@ -86,6 +93,11 @@ func (r *RealizarReservaService) RealizarReserva(dto CriarReservaDTO) (ReservaRe
 	var reservaResponse ReservaResponse
 
 	err := r.Db.Transaction(func(tx *gorm.DB) error {
+		err := debitarVaga(tx, r.vagaRepo, dto.VagaId)
+		if err != nil {
+			return errors.New("Falha ao debitar a vaga")
+		}
+
 		// 1. Salva os dados gerais do candidato/responsavel
 		candDto := candidato.CreateCandidatoDTO{
 			Nome:                    dto.NomeCandidato,
@@ -243,4 +255,8 @@ func gerarStringAleatoria(n int) string {
 		sb.WriteByte(letras[idx])
 	}
 	return sb.String()
+}
+
+func debitarVaga(tx *gorm.DB, vagaRepo vagasescolares.Repository, vagaId string) error {
+	return vagaRepo.DebitarVaga(tx, vagaId)
 }
