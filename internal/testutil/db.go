@@ -14,7 +14,7 @@ import (
 
 func NovoDBTeste(t *testing.T) *gorm.DB {
 	t.Helper()
-	dsn := "root:l1nux123.@tcp(127.0.0.1:3306)/reservas_test?charset=utf8mb4&parseTime=True&loc=Local"
+	dsn := "root:l1nux123.@tcp(127.0.0.1:3306)/reserva_vagas_db?charset=utf8mb4&parseTime=True&loc=Local"
 
 	return AbrirMySQL(t, dsn)
 }
