@@ -3,6 +3,7 @@ package repositories
 import (
 	"errors"
 	"reserva_vagas/internal/candidato"
+	"reserva_vagas/internal/reservas"
 
 	"gorm.io/gorm"
 )
@@ -77,7 +78,10 @@ func (r *CandidatoRepository) Destroy(id string) error {
 
 func (r *CandidatoRepository) FindByCpf(cpf string) (*candidato.Candidato, error) {
 	candidato := &candidato.Candidato{}
-	tx := r.Db.Where("cpf = ?", cpf).First(&candidato).Error
+	tx := r.Db.Joins("INNER JOIN reservas ON candidatos.id = reservas.candidato_id").
+		Where("cpf = ?", cpf).
+		Where("situacao != ?", reservas.SituacaoCancelada).
+		First(&candidato).Error
 
 	return candidato, tx
 }
