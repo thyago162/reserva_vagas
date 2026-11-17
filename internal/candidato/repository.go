@@ -7,5 +7,5 @@ type Repository interface {
 	Show(id string) (*Candidato, error)
 	Update(candidato *Candidato) error
 	Destroy(id string) error
-	FindByCpf(cpf string) (*Candidato, error)
+	FindByCpf(cpf string) (bool, error)
 }

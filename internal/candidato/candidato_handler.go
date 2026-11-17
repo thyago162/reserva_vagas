@@ -1,16 +1,19 @@
 package candidato
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"reserva_vagas/internalerrors"
 
 	"github.com/go-chi/chi"
-	"gorm.io/gorm"
 )
 
 type CandidatoHandler struct {
 	service *Service
+}
+
+type ExisteReservaResponse struct {
+	Existe bool `json:"existe"`
 }
 
 func NewCandidatoHandler(s *Service) *CandidatoHandler {
@@ -23,14 +26,15 @@ func (h *CandidatoHandler) FindByCpf(w http.ResponseWriter, r *http.Request) (in
 		return nil, http.StatusBadRequest, internalerrors.ErrValidation
 	}
 
-	candidato, err := h.service.FindByCpf(cpf)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, http.StatusNotFound, internalerrors.ErrNotFound
-	}
+	existe, err := h.service.FindByCpf(cpf)
+
+	fmt.Println(err)
 
 	if err != nil {
 		return nil, http.StatusInternalServerError, err
 	}
 
-	return candidato.Cpf, http.StatusOK, nil
+	fmt.Println(existe)
+
+	return ExisteReservaResponse{Existe: existe}, http.StatusOK, nil
 }

@@ -76,12 +76,12 @@ func (r *CandidatoRepository) Destroy(id string) error {
 	return tx.Error
 }
 
-func (r *CandidatoRepository) FindByCpf(cpf string) (*candidato.Candidato, error) {
-	candidato := &candidato.Candidato{}
-	tx := r.Db.Joins("INNER JOIN reservas ON candidatos.id = reservas.candidato_id").
+func (r *CandidatoRepository) FindByCpf(cpf string) (bool, error) {
+	var total int64
+	err := r.Db.Model(candidato.Candidato{}).Joins("INNER JOIN reservas ON candidatos.id = reservas.candidato_id").
 		Where("cpf = ?", cpf).
 		Where("situacao != ?", reservas.SituacaoCancelada).
-		First(&candidato).Error
+		Count(&total).Error
 
-	return candidato, tx
+	return total > 0, err
 }

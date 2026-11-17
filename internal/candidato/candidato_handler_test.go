@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi"
 )
 
-func TestCandidatoHandler_FindByCpf_RetornaCpf(t *testing.T) {
+func TestCandidatoHandler_FindByCpf_RetornaReservaExiste(t *testing.T) {
 	db := testutil.NovoDBTeste(t)
 	repo := repositories.NewCandidatoRepository(db)
 	service := candidato.NewService(repo)
@@ -35,12 +35,12 @@ func TestCandidatoHandler_FindByCpf_RetornaCpf(t *testing.T) {
 		t.Fatalf("status = %d, esperado %d", status, http.StatusOK)
 	}
 
-	cpf, ok := body.(string)
+	existe, ok := body.(bool)
 	if !ok {
-		t.Fatalf("resposta deveria ser só o CPF (string), veio %T: %+v", body, body)
+		t.Fatalf("resposta deveria ser só o 1, veio %T: %+v", body, body)
 	}
 
-	if cpf != "52998224725" {
-		t.Errorf("cpf = %s, esperado 52998224725", cpf)
+	if !existe {
+		t.Errorf("existe = %t, esperado True", existe)
 	}
 }
