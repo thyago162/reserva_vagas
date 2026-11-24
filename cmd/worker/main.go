@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/smtp"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/rabbitmq/amqp091-go"
 )
 
@@ -17,9 +19,14 @@ type EmailReservaPayload struct {
 }
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("arquivo .env não encontrado, usando variáveis de ambiente")
+	}
+
 	amqpURL := os.Getenv("RABBITMQ_URL")
 	if amqpURL == "" {
-		amqpURL = "amqp://admin:admin123.@localhost:5672/"
+		amqpURL = os.Getenv("RABBITMQ_CONN")
 	}
 
 	conn, err := amqp091.Dial(amqpURL)

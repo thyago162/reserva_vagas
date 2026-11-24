@@ -14,7 +14,7 @@ type RabbitMQConnection struct {
 }
 
 func NewRabbitMQ() (*RabbitMQConnection, error) {
-	url := os.Getenv("RABBITMQ_URL")
+	url := os.Getenv("RABBITMQ_CONN")
 	if url == "" {
 		url = "amqp://admin:admin123.@localhost:5672/"
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"reserva_vagas/internal/endpoints"
@@ -17,7 +18,7 @@ import (
 func main() {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Erro ao carregar o arquivo .env")
+		fmt.Println("arquivo .env não encontrado, usando variáveis de ambiente")
 	}
 
 	r := chi.NewRouter()
